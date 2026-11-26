@@ -1,0 +1,79 @@
+# Tide · binaural
+
+A standalone page for *Tide*, a generative Csound soundscape that runs live in the browser
+(via [@csound/browser](https://www.npmjs.com/package/@csound/browser)), kept separate from salomezhang.com.
+
+## What's here
+
+**The page**
+
+| File | What it does |
+| --- | --- |
+| `index.html` | The page's contents only: front page (play, volume, presets, binaural) and the controller. |
+| `style.css` | How it looks. |
+| `js/config.js` | Fixed data: voice names, presets, starting rhythm and breath rows. Edit presets here. |
+| `js/state.js` | What the controls are set to, saved between visits, and the list of Csound channels. |
+| `js/engine.js` | The sound engine: loads Csound, the piece and the HRTF data; start, stop, send, read. |
+| `js/multislider.js` | The multislider and the voice tabs. |
+| `js/main.js` | Connects the controls to the state and the engine. |
+
+**The piece** (`csound/`; run it on its own with `csound tide.csd` from that folder)
+
+| File | What it holds |
+| --- | --- |
+| `tide.csd` | The main file: options, the seven includes, and the score that starts everything. |
+| `space.inc` | The binaural space: HRTF data, the room buses. |
+| `controls.inc` | Reading the page's controls, voice gain, placing a sound around the head. |
+| `harmony.inc` | The shared harmony: the three colours, chord shapes, the motif, sections, the Markov table, default rhythm and breath rows. |
+| `machines.inc` | The conductor, and the machine that gives each voice its phrases and rests. |
+| `voices-pitched.inc` | Chords, bass, counter. |
+| `voices-texture.inc` | Drops, waves, shimmer, flyer. |
+| `output.inc` | The binaural room and the master output. |
+
+**Other**
+
+| Path | What it is |
+| --- | --- |
+| `lab/binaural-test-web.csd`, `lab/binaural-test.csd` | The isolated binaural A/B test (browser version, and a self-contained version with HRTF data embedded) |
+| `media/hrtf/` | Csound's measured HRTF data (44.1, 48, 96 kHz) |
+
+In the browser, `js/engine.js` fetches `tide.csd` and its parts and joins them before handing the text to Csound.
+
+## How the piece works
+
+Seven voices: counter (bowed string, `wgbow`), bass (plucked string, `wgpluck2`), chords (aeolian harp, `noise` → `wguide1`), drops (water on porcelain: a wet tick into four damped `mode` resonators), waves (filtered `noise`), shimmer (`dust2` → `mode`), flyer (pings with `vdelay3` Doppler). All are placed with `hrtfmove2` in an `hrtfearly` + `hrtfreverb` room.
+
+- **Each voice has its own machine** (`instr 10`, one instance per voice): a phrase, a rest, and again. A phrase is two passes of the voice's 8-beat rhythm row. This instrument stands where a sculpture will.
+- **Phasing:** each voice's phrase is a little longer than the one before (DRIFT), so they start together and drift apart.
+- **Breath:** each voice's breath row sets its rest after each of 8 phrases. A full bar means wait: the voice stays silent until counter, bass and chords are all waiting.
+- **Harmony, Debussy mode:** everything is in one scale at a time, whole-tone or pentatonic. Chords are one shape moved in parallel.
+- **Harmony, dark mode** (after Berklee *Harmony 4*, parts 5 and 6): the half-whole scale. Chords are polychords: root and fifth below, a close major triad above, on the tritone or the sixth. They move as a constant structure, down a minor third each time; the half-whole scale is the same at every minor third, so the chord scale stays constant. The pattern is broken on the last chord before a shared silence.
+- **Sections:** only when the three pitched voices are all waiting does the harmony change (Debussy mode flips colour), in a new key, and everyone begins again together. Changing the root or harmony on the page asks every voice to stop after its current phrase, so that silence comes within about 20 seconds; the chosen root is then used exactly.
+- **Home:** within a section, home moves when the counter starts a phrase. The move (step up, step down, skip up) is drawn from a Markov chain on the previous move (`giMarkov`). In dark mode a step is a minor third and a skip a tritone. The bass holds a pedal; phrases end on the 2nd or the note below home.
+- **Motif:** there is no melody. The counter plays an 8-note motif (upside down) that changes a little between phrases.
+- **Frozen inputs:** a voice reads its rhythm row, breath row and activity when its phrase begins. On the page a changed bar stays yellow until then.
+
+## Channels
+
+| Channel | Meaning |
+| --- | --- |
+| `on<v>`, `act<v>`, `lvl<v>` | voice on/off, activity (how many of its row's notes it plays), level (gain = (2 × value)²) |
+| `div<v>_<beat>` | rhythm row: notes in each of 8 beats (waves: swell height) |
+| `wait<v>_<phrase>` | breath row: rest after each of 8 phrases, 1 = wait for everyone |
+| `tonic`, `mood`, `gather` | root (semitones from D), harmony (0 Debussy, 1 dark); the page raises `gather` by one when either changes |
+| `drift`, `room`, `bin`, `vol` | phase drift, room amount, binaural, volume |
+| `runbits`, `colour_now`, `tonic_now`, `section_now`, `level` | sent back to the page: which machines are running, the current colour, key and section, output level |
+
+Voices `<v>`: 0 counter, 1 bass, 2 chords, 3 drops, 4 waves, 5 shimmer, 6 flyer.
+
+## Run locally
+
+```
+python3 -m http.server
+```
+
+then open http://localhost:8000 (it must be served; opening the file directly can't load the scripts, the piece or the HRTF files).
+
+## Host
+
+Any static host works (GitHub Pages, Netlify, Cloudflare Pages): upload the folder as is.
