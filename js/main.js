@@ -9,6 +9,12 @@ const $ = id => document.getElementById(id);
 const voiceNames = VOICES.map(v => v[0]);
 let piece = 'tide', playing = false, timer = null, t0 = 0, lastBits = 0;
 
+// When Tide is shown inside another site (<html data-tide-embed>), it leaves the page's
+// address alone, and the host can quiet it (window.Tide.quiet) while its own audio plays.
+const EMBED = document.documentElement.hasAttribute('data-tide-embed');
+let quiet = false;
+const sendVol = () => engine.send('vol', quiet ? 0 : state.vol);
+
 /* ---------- changes waiting to be heard ----------
    Controls marked "next phrase" are read by a voice when its phrase begins, so a change
    stays pending (yellow) until that voice's button lights up again. */
@@ -32,7 +38,7 @@ function askGather() {
 
 /* ---------- front page ---------- */
 function showVol() { $('vol').value = state.vol; $('volOut').textContent = Math.round(state.vol * 100) + '%'; }
-$('vol').addEventListener('input', e => { state.vol = +e.target.value; showVol(); engine.send('vol', state.vol); save(); });
+$('vol').addEventListener('input', e => { state.vol = +e.target.value; showVol(); sendVol(); save(); });
 
 function showBin() {
   $('binTxt').textContent = state.bin ? 'BINAURAL ON' : 'BINAURAL OFF';
@@ -48,7 +54,7 @@ function applyPreset(i) {
     waits: WAIT0.map(row => row.map(x => x >= 0.95 ? x : Math.min(0.9, x + p.slower))) });
   VOICES.forEach((_, v) => { pending.act.add(v); pending.wait.add(v); });
   const ch = allChannels();
-  for (const k in ch) if (k !== 'gather') engine.send(k, ch[k]);
+  for (const k in ch) if (k !== 'gather' && k !== 'vol') engine.send(k, ch[k]);
   if (moodChanged) askGather();
   showAll(); save();
 }
@@ -118,10 +124,10 @@ function showController(open) {
   $('controller').hidden = !open; $('controller').style.display = open ? 'flex' : 'none';
   $('ctlBtn').textContent = open ? 'CLOSE CONTROLLER' : 'OPEN CONTROLLER';
   $('ctlBtn').setAttribute('aria-expanded', open ? 'true' : 'false');
-  history.replaceState(null, '', open ? '#controller' : location.pathname + location.search);
+  if (!EMBED) history.replaceState(null, '', open ? '#controller' : location.pathname + location.search);
 }
 $('ctlBtn').addEventListener('click', () => showController($('controller').hidden));
-showController(location.hash === '#controller');
+showController(!EMBED && location.hash === '#controller');
 
 /* ---------- play / pause ---------- */
 function setStatus(html) { $('status').innerHTML = html; }
@@ -129,7 +135,7 @@ function setStatus(html) { $('status').innerHTML = html; }
 async function start() {
   $('play').disabled = true; setStatus('starting…');
   try {
-    await engine.start(piece, allChannels());
+    await engine.start(piece, { ...allChannels(), vol: quiet ? 0 : state.vol });
     for (const k in pending) pending[k].clear();   // everything is read fresh at the start
     playing = true; t0 = performance.now(); lastBits = 0; gather.waiting = false; gather.section = -1;
     $('play').textContent = 'PAUSE';
@@ -151,6 +157,14 @@ async function stop() {
   setStatus('Paused. PLAY starts a new performance.');
 }
 $('play').addEventListener('click', () => playing ? stop() : start());
+
+// for a host page
+window.Tide = {
+  start: () => playing ? Promise.resolve() : start(),
+  stop: () => playing ? stop() : Promise.resolve(),
+  quiet: q => { quiet = !!q; sendVol(); },
+  isPlaying: () => playing };
+window.dispatchEvent(new Event('tide-ready'));
 
 // several times a second: show what the piece is doing
 async function tick() {
@@ -185,17 +199,17 @@ async function tick() {
     : key + ((bits & 7) === 0 && t > 3 ? ' · counter, bass and chords are silent' : '');
 }
 
-/* ---------- binaural test and code view ---------- */
+/* ---------- binaural test and code view (only on Tide's own page) ---------- */
 function selectPiece(p) {
   piece = p;
   $('pTest').setAttribute('aria-pressed', p === 'test');
   $('pTest').textContent = p === 'test' ? 'BACK TO TIDE' : 'BINAURAL TEST';
   $('bin').disabled = p === 'test';
-  if ($('code').style.display === 'block') renderCode();
+  if ($('code') && $('code').style.display === 'block') renderCode();
   if (playing) stop().then(start);
   else setStatus(p === 'test' ? 'Binaural test: one source, four ways, about 50 s. Press PLAY.' : 'Starts quietly and fades in. Headphones recommended.');
 }
-$('pTest').addEventListener('click', () => selectPiece(piece === 'test' ? 'tide' : 'test'));
+if ($('pTest')) $('pTest').addEventListener('click', () => selectPiece(piece === 'test' ? 'tide' : 'test'));
 
 const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 async function renderCode() {
@@ -205,7 +219,7 @@ async function renderCode() {
     return i < 0 ? esc(l) : esc(l.slice(0, i)) + '<span class="c">' + esc(l.slice(i)) + '</span>';
   }).join('\n');
 }
-$('codeBtn').addEventListener('click', async () => {
+if ($('codeBtn')) $('codeBtn').addEventListener('click', async () => {
   const open = $('code').style.display !== 'block';
   if (open) await renderCode();
   $('code').style.display = open ? 'block' : 'none';

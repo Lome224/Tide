@@ -6,7 +6,11 @@ import { PIECES } from './config.js';
 const CSOUND_URL = 'https://cdn.jsdelivr.net/npm/@csound/browser@6.18.7/dist/csound.js';
 const RATES = [44100, 48000, 96000];
 
-const fetchText = url => fetch(url).then(r => { if (!r.ok) throw new Error(url); return r.text(); });
+// Tide's own files are found relative to this script, so the piece also works when the
+// page that shows it lives on another site.
+const BASE = new URL('..', import.meta.url).href;
+
+const fetchText = url => fetch(BASE + url).then(r => { if (!r.ok) throw new Error(url); return r.text(); });
 
 // The piece is one .csd that #includes its parts. They are fetched and joined here, so
 // Csound in the browser receives a single text.
@@ -26,7 +30,7 @@ const hrtf = {};
 function getHrtf(rate) {
   return hrtf[rate] ??= Promise.all(['left', 'right'].map(ear => {
     const f = `hrtf-${rate}-${ear}.dat`;
-    return fetch('media/hrtf/' + f).then(r => { if (!r.ok) throw new Error(f); return r.arrayBuffer(); })
+    return fetch(BASE + 'media/hrtf/' + f).then(r => { if (!r.ok) throw new Error(f); return r.arrayBuffer(); })
       .then(b => [f, new Uint8Array(b)]);
   }));
 }

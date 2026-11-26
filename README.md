@@ -1,7 +1,14 @@
 # Tide · binaural
 
-A standalone page for *Tide*, a generative Csound soundscape that runs live in the browser
-(via [@csound/browser](https://www.npmjs.com/package/@csound/browser)), kept separate from salomezhang.com.
+A generative soundscape, synthesised live in the browser with Csound. Listen at **https://tide.salomezhang.com**.
+
+Tide is seven voices, each with its own cycle: a phrase, a rest, and again. The cycles are slightly different lengths, so the voices start together, drift apart, and now and then gather in a shared silence before starting again in a new key.
+
+There are two kinds of harmony. One follows Debussy: everything is whole-tone or pentatonic, changing only in a shared silence. The other is dark: polychords (a major triad set over a root and fifth a tritone or a sixth away) moved as a constant structure, down a minor third each time, inside the half-whole scale. In both, home moves from note to note, the bass holds a pedal, and phrases end unresolved.
+
+The pitched voices are physical models: a bowed string, a plucked string and an aeolian harp. Drops are water landing on glazed porcelain, shimmer is shards touching, the waves are filtered noise, and a flyer passes close with Doppler. With binaural on, each voice is placed around your head inside a binaural room.
+
+It extends the system of *The Blue Left Spinning*: each voice stands where a sculpture will.
 
 ## What's here
 
