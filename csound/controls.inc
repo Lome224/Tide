@@ -39,7 +39,12 @@ opcode Place, 0, akkkkkk
   kaz wrap kaz, 0, 360
   kpan limit kpan, 0, 1
   aSL, aSR pan2 asig, kpan
-  aBL, aBR hrtfmove2 asig, kaz, kel, gSHL, gSHR, 4, 9, sr
+  if giLite == 1 then
+    aBL = aSL
+    aBR = aSR
+  else
+    aBL, aBR hrtfmove2 asig, kaz, kel, gSHL, gSHR, 4, 9, sr
+  endif
   RoomSend asig, kaz, kroom*kbin
   aL = aSL*(1-kbin) + aBL*kbin*1.4
   aR = aSR*(1-kbin) + aBR*kbin*1.4

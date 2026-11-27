@@ -90,3 +90,17 @@
   #controller .pair{grid-template-columns:1fr}
   #controller:has(#more:not([hidden])) #picture{display:none}   /* the knobs stay; the pad makes room */
 }
+
+/* touch screens: bigger targets */
+@media (pointer:coarse){
+  #controller .knob .dial{width:44px;height:44px}
+  #controller .knob .dial::after{top:5px;height:11px}
+  #controller .knob{font-size:9.5px;gap:5px}
+  #controller .body #presets button{padding:8px 12px}
+  #controller .body .tabs button{padding:8px 14px;font-size:11px}
+  #controller .body button,#controller select{padding:8px 12px}
+  #controller .body .keys button{padding:0 0 6px}
+  #lines{height:210px}
+  #controller .ms.short,#controller .ms{height:84px}
+  #controller .hs input{width:150px}
+}

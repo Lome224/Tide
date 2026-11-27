@@ -1,10 +1,12 @@
 // Tide: what the controls are set to, kept between visits, and how it is sent to Csound.
 
-import { DEFAULTS, VOICES } from './config.js';
+import { DEFAULTS, VOICES, PHONE } from './config.js';
 
 const KEY = 'tideState11';
 
 export const state = structuredClone(DEFAULTS);
+// a first visit on a phone: plain stereo (which runs the light engine) and no shimmer or flyer
+if (PHONE) { state.bin = 0; state.on[5] = state.on[6] = 0; }
 try { Object.assign(state, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
 export function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
 

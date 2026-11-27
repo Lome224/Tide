@@ -74,6 +74,7 @@ Seven voices: counter (bowed string, `wgbow`), bass (plucked string, `wgpluck2`)
 | `on<v>`, `act<v>`, `lvl<v>` | voice on/off, activity (how many of its row's notes it plays), level (gain = (2 × value)²) |
 | `div<v>_<beat>` | rhythm row: notes in each of 8 beats (waves: swell height) |
 | `wait<v>_<phrase>` | breath row: rest after each of 8 phrases, 1 = wait for everyone |
+| `lite` | 1 = the light engine: plain stereo, no binaural placement or room (about a third of the work). Read once, when the piece starts. The page sets it when binaural is off; phones start that way. |
 | `tonic`, `colA`, `colB`, `gather` | root (semitones from D), and the two scales the piece alternates (0 to 9, numbered in `csound/harmony.inc`); the page raises `gather` by one when any of them changes |
 | `drift`, `room`, `bin`, `vol` | phase drift, room amount, binaural, volume |
 | `runbits`, `colour_now`, `tonic_now`, `section_now`, `level` | sent back to the page: which machines are running, the current colour, key and section, output level |

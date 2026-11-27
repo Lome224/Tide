@@ -36,3 +36,7 @@ opcode RoomSend, 0, akk
   gaQ3 = gaQ3 + asig*k3*kamt
   gaQ4 = gaQ4 + asig*k4*kamt
 endop
+
+; the light engine (channel "lite" = 1, read once at the start): plain stereo only. No voice
+; is placed binaurally and the binaural room is not run, which is most of the work. For phones.
+giLite init 0

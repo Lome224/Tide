@@ -106,7 +106,12 @@ instr 5
   ; stereo: follow the same circle with a simple pan
   kpan = 0.5 + 0.45*sin(kaz*$M_PI/180)
   aSL, aSR pan2 asig*0.6, kpan
-  aBL, aBR hrtfmove2 asig, kaz, kel, gSHL, gSHR, 4, 9, sr
+  if giLite == 1 then
+    aBL = aSL
+    aBR = aSR
+  else
+    aBL, aBR hrtfmove2 asig, kaz, kel, gSHL, gSHR, 4, 9, sr
+  endif
   RoomSend asig, kaz, 0.8*kbin
   aL = aSL*(1-kbin) + aBL*kbin*1.4
   aR = aSR*(1-kbin) + aBR*kbin*1.4
@@ -156,7 +161,12 @@ instr 6
   kbin port kbin, 0.3
   kpan = 0.5 + 0.5*kx/sqrt(kx*kx + 4)
   aSL, aSR pan2 asig*0.7, kpan
-  aBL, aBR hrtfmove2 asig, kaz, kel, gSHL, gSHR, 4, 9, sr
+  if giLite == 1 then
+    aBL = aSL
+    aBR = aSR
+  else
+    aBL, aBR hrtfmove2 asig, kaz, kel, gSHL, gSHR, 4, 9, sr
+  endif
   RoomSend asig, kaz, 0.25*kbin
   aL = aSL*(1-kbin) + aBL*kbin*1.4
   aR = aSR*(1-kbin) + aBR*kbin*1.4

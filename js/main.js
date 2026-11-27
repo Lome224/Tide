@@ -1,6 +1,6 @@
 // Tide: the page. Connects the controls in index.html to the state and the sound engine.
 
-import { VOICES, NOTES, COLOURS, SCALES, COLOUR_MENU, PRESETS, WAIT0, DIV_HINT, TEST_SECTIONS } from './config.js';
+import { PHONE, VOICES, NOTES, COLOURS, SCALES, COLOUR_MENU, PRESETS, WAIT0, DIV_HINT, TEST_SECTIONS } from './config.js';
 import { state, save, gather, tonicOffset, allChannels } from './state.js';
 import * as engine from './engine.js';
 import { multislider, tabs } from './multislider.js';
@@ -19,6 +19,9 @@ let piece = 'tide', playing = false, timer = null, t0 = 0, lastBits = 0;
 // address alone, and the host can quiet it (window.Tide.quiet) while its own audio plays.
 const EMBED = document.documentElement.hasAttribute('data-tide-embed');
 let quiet = false;
+// The light engine (no binaural processing at all, about a third of the work) is chosen when a
+// performance starts with binaural off. Turning binaural on then needs a fresh start.
+let lite = 0;
 const sendVol = () => engine.send('vol', quiet ? 0 : state.vol);
 
 /* ---------- changes waiting to be heard ----------
@@ -52,11 +55,14 @@ function showBin() {
   $('binTxt').textContent = state.bin ? 'BINAURAL ON' : 'BINAURAL OFF';
   $('bin').setAttribute('aria-pressed', state.bin ? 'true' : 'false');
 }
-$('bin').addEventListener('click', () => { state.bin = state.bin ? 0 : 1; showBin(); engine.send('bin', state.bin); save(); });
+$('bin').addEventListener('click', () => {
+  state.bin = state.bin ? 0 : 1; showBin(); engine.send('bin', state.bin); save();
+  if (playing && lite && state.bin) stop().then(start);
+});
 
 function applyPreset(i) {
   const p = PRESETS[i], pairChanged = state.colA !== p.pair[0] || state.colB !== p.pair[1];
-  Object.assign(state, { preset: i, colA: p.pair[0], colB: p.pair[1], room: p.room, on: p.on.slice(),
+  Object.assign(state, { preset: i, colA: p.pair[0], colB: p.pair[1], room: p.room, on: p.on.map((x, v) => PHONE && v >= 5 ? 0 : x),   // phones: no shimmer or flyer
     act: VOICES.map(() => p.act),
     // every rest longer by `slower`; a WAIT bar stays a WAIT bar
     waits: WAIT0.map(row => row.map(x => x >= 0.95 ? x : Math.min(0.9, x + p.slower))) });
@@ -262,7 +268,8 @@ function setStatus(html) { $('status').innerHTML = html; }
 async function start() {
   $('play').disabled = true; setStatus('starting…');
   try {
-    await engine.start(piece, { ...allChannels(), vol: quiet ? 0 : state.vol });
+    lite = state.bin ? 0 : 1;
+    await engine.start(piece, { ...allChannels(), lite, vol: quiet ? 0 : state.vol });
     for (const k in pending) pending[k].clear();   // everything is read fresh at the start
     playing = true; t0 = performance.now(); lastBits = 0; gather.waiting = false; gather.section = -1;
     $('play').textContent = 'PAUSE';
@@ -305,7 +312,9 @@ async function tick() {
     if (t > 51) { await stop(); setStatus('Test finished. Press PLAY to hear it again.'); }
     return;
   }
-  setStatus(`<b>playing</b> · ${state.bin ? 'binaural' : 'stereo'} · ${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`);
+  // iPhones: the switch on the side silences web pages, which looks like a broken site
+  const hush = /iPhone|iPad/.test(navigator.userAgent) && t < 15 ? ' · no sound? check the silent switch' : '';
+  setStatus(`<b>playing</b> · ${state.bin ? 'binaural' : 'stereo'} · ${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}${hush}`);
   const values = await engine.read(['level', 'runbits', 'colour_now', 'tonic_now', 'section_now']);
   if (!values || !playing) return;
   const [level, bitsF, colour, tonic, section] = values, bits = Math.round(bitsF);

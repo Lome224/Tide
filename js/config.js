@@ -1,5 +1,8 @@
 // Tide: the fixed data. Names, presets and starting values; no behaviour.
 
+// a phone: a touch screen that is also small. Phones start with the light engine and fewer voices.
+export const PHONE = typeof matchMedia === 'function' && matchMedia('(pointer:coarse) and (max-width:820px)').matches;
+
 export const PIECES = { tide: 'csound/tide.csd', test: 'lab/binaural-test-web.csd' };
 
 // each voice: its name, a short name, and what it sounds like

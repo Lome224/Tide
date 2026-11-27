@@ -2,6 +2,7 @@
 
 ; ---------- conductor: space, and the change of colour ----------
 instr 1
+  giLite CtlI "lite", 0
   NewSection
   krm Ctl "room", 0.5
   gkRoom = krm*2

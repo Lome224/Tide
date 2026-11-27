@@ -41,7 +41,12 @@ instr 4
   aair = aair * (0.5 + 0.5*ktone) * 0.35 * kbin
   asig = (a1*1.6 + a3*0.5*(0.6 + ktone) + aair) * aenv * 0.022 * kvg
   aSL, aSR pan2 asig, kpan
-  aBL, aBR hrtfmove2 asig, kaz, iel, gSHL, gSHR, 4, 9, sr
+  if giLite == 1 then
+    aBL = aSL
+    aBR = aSR
+  else
+    aBL, aBR hrtfmove2 asig, kaz, iel, gSHL, gSHR, 4, 9, sr
+  endif
   RoomSend asig, kaz, 0.7*kbin
   aL = aSL*(1-kbin) + aBL*kbin*1.25
   aR = aSR*(1-kbin) + aBR*kbin*1.25
