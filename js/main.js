@@ -11,7 +11,6 @@ let piece = 'tide', timer = null, t0 = 0, lastBits = 0;
 // own ENTER button, so the sound may begin later, once everything has loaded.
 let unlocked = null;
 hooks.restart = () => stop().then(start);
-hooks.pause = () => stop();
 
 /* ---------- play / pause ---------- */
 function setStatus(html) { $('status').innerHTML = html; }
