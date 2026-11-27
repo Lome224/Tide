@@ -4,7 +4,7 @@
 import { VOICES, NOTES, COLOURS, TEST_SECTIONS } from './config.js';
 import { state, gather, allChannels, live } from './state.js';
 import * as engine from './engine.js';
-import { $, put, hooks, pending, chosen, showPending, showController, showKeys, drawLines, sendVol } from './controls.js';
+import { $, put, hooks, pending, chosen, showPending, showController, showKeys, drawLines, sendVol, showHome } from './controls.js';
 
 let piece = 'tide', timer = null, t0 = 0, lastBits = 0;
 hooks.restart = () => stop().then(start);
@@ -32,7 +32,7 @@ async function start() {
 async function stop() {
   clearInterval(timer); timer = null; live.playing = false;
   $('play').textContent = 'PLAY'; $('meter').style.width = '0'; $('now').textContent = '';
-  put('keyBox', ''); drawLines(0); showKeys(-1, -1);
+  showHome(); drawLines(0); showKeys(-1, -1);
   for (const k in pending) pending[k].clear();
   showPending();
   await engine.stop();
@@ -88,29 +88,13 @@ async function tick() {
     : key + ((bits & 7) === 0 && t > 3 ? ' · counter, bass and chords are silent' : '');
 }
 
-/* ---------- binaural test and code view (only on Tide's own page) ---------- */
+/* ---------- binaural test (only on Tide's own page) ---------- */
 function selectPiece(p) {
   piece = p;
   $('pTest').setAttribute('aria-pressed', p === 'test');
   $('pTest').textContent = p === 'test' ? 'BACK TO TIDE' : 'BINAURAL TEST';
   $('bin').disabled = p === 'test';
-  if ($('code') && $('code').style.display === 'block') renderCode();
   if (live.playing) stop().then(start);
   else setStatus(p === 'test' ? 'Binaural test: one source, four ways, about 50 s. Press PLAY.' : 'Starts quietly and fades in. Headphones recommended.');
 }
 if ($('pTest')) $('pTest').addEventListener('click', () => selectPiece(piece === 'test' ? 'tide' : 'test'));
-
-const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
-async function renderCode() {
-  const text = await engine.getSource(piece);
-  $('code').innerHTML = text.split('\n').map(l => {
-    const i = l.indexOf(';');
-    return i < 0 ? esc(l) : esc(l.slice(0, i)) + '<span class="c">' + esc(l.slice(i)) + '</span>';
-  }).join('\n');
-}
-if ($('codeBtn')) $('codeBtn').addEventListener('click', async () => {
-  const open = $('code').style.display !== 'block';
-  if (open) await renderCode();
-  $('code').style.display = open ? 'block' : 'none';
-  $('codeBtn').textContent = open ? 'HIDE CODE' : 'CODE';
-});

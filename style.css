@@ -27,9 +27,6 @@ button:disabled{opacity:.4;cursor:default}
 .about{color:var(--dim);border-top:1px solid var(--line);padding-top:18px}
 .about p{margin:0 0 10px}
 .about b{color:var(--fg);font-weight:400}
-pre{display:none;margin:0;padding:14px;max-height:60vh;overflow:auto;background:#0b0b0b;border:1px solid var(--line);
-  border-radius:8px;font-size:11px;line-height:1.5;white-space:pre}
-pre .c{color:#6f6f6f}
 @media (max-width:560px){
   .hs input{width:110px}.hs{gap:6px;flex-wrap:wrap}
 }
@@ -50,6 +47,5 @@ button.glass:hover,button.glass:focus-visible,#bin[aria-pressed="true"]{
 .bin.glass small{color:inherit;opacity:.65}
 
 /* the controller sits in the page as a panel */
-#controller{border:1px solid var(--line);border-radius:10px;max-width:600px}
+div#controller{border:1px solid var(--line);border-radius:10px;font-size:13px;max-width:52em}
 #controller .extra{padding:0 16px 16px}
-#controller pre{margin:0 16px 16px}

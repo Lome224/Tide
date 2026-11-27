@@ -1,69 +1,71 @@
 /* Tide: the controller's appearance. Used by Tide's own page and by any site showing Tide.
-   Everything is inside #controller. One shape throughout: thin lines, 6px corners. */
+   Everything is inside #controller. One shape throughout: thin lines, 6px corners.
+   Sizes are in em, so the whole controller grows or shrinks with #controller's font-size
+   (11px here; a page may set its own). The two drawings follow it too. */
 #controller{background:rgba(0,0,0,.86);color:#e8e8e8;font-size:11px;line-height:1.5;letter-spacing:.06em}
-#controller .body{display:flex;flex-direction:column;gap:12px;padding:14px 16px 16px;min-height:0;overflow:hidden}
+#controller .body{display:flex;flex-direction:column;gap:1.091em;padding:1.273em 1.455em 1.455em;min-height:0;overflow:hidden}
 #controller .body > *{flex:none}
-#picture{display:block;width:100%;height:280px;touch-action:none;cursor:crosshair}
+#picture{display:block;width:100%;height:25.455em;touch-action:none;cursor:crosshair}
 /* under the picture: the key, three knobs, the five sounds, MORE */
-#controller .strip{display:flex;align-items:flex-start;gap:14px;padding-top:12px;border-top:1px solid #222}
-#controller .key{flex:none;width:40px;height:32px;display:grid;place-items:center;border:1px solid #2a2a2a;border-radius:6px;font-size:13px;color:#bbb}
-#controller .knob{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:8.5px;letter-spacing:.14em;color:#8a8a8a;cursor:ns-resize;position:relative;touch-action:none;user-select:none}
-#controller .knob .dial{width:30px;height:30px;border-radius:50%;border:1px solid #3a3a3a;background:radial-gradient(circle at 35% 30%, #2a2a2a, #0c0c0c);position:relative;transform:rotate(var(--a,0deg))}
-#controller .knob .dial::after{content:"";position:absolute;left:50%;top:3px;width:2px;height:8px;margin-left:-1px;border-radius:1px;background:#e8e8e8}
+#controller .strip{display:flex;align-items:flex-start;gap:1.273em;padding-top:12px;border-top:1px solid #222}
+#controller .key{flex:none;width:3.636em;height:2.909em;display:grid;place-items:center;border:1px solid #2a2a2a;border-radius:6px;font-size:1.182em;color:#bbb}
+#controller .knob{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:0.773em;letter-spacing:.14em;color:#8a8a8a;cursor:ns-resize;position:relative;touch-action:none;user-select:none}
+#controller .knob .dial{width:2.727em;height:2.727em;border-radius:50%;border:1px solid #3a3a3a;background:radial-gradient(circle at 35% 30%, #2a2a2a, #0c0c0c);position:relative;transform:rotate(var(--a,0deg))}
+#controller .knob .dial::after{content:"";position:absolute;left:50%;top:3px;width:2px;height:0.727em;margin-left:-1px;border-radius:1px;background:#e8e8e8}
 #controller .knob input{position:absolute;inset:0;opacity:0;pointer-events:none}
 #controller .knob:hover .dial,#controller .knob:focus-within .dial{border-color:#e8e8e8}
 #controller .knob output{color:#555;letter-spacing:.04em}
 #controller .knob.still{cursor:default}
-#controller .key{height:30px}
+#controller .key{height:2.727em}
 /* the five sounds, as a menu bar across the top */
-#presets{display:flex;gap:2px;padding-bottom:10px;border-bottom:1px solid #222}
-#controller .body #presets button{border:0;background:none;border-radius:4px;padding:3px 12px;color:#9a9a9a;letter-spacing:.14em}
+#presets{display:flex;gap:2px;padding-bottom:0.909em;border-bottom:1px solid #222}
+#controller .body #presets button{border:0;background:none;border-radius:4px;padding:3px 1.091em;color:#9a9a9a;letter-spacing:.14em}
 #controller .body #presets button:hover{color:#fff;background:#1c1c1c}
 #controller .body #presets button[aria-pressed="true"]{background:#e8e8e8;color:#000}
 #controller .strip .push{align-self:center;margin-left:auto}
 #controller .body button,#controller select{font:inherit;letter-spacing:inherit;color:#e8e8e8;background:#111;border:1px solid #3a3a3a;border-radius:6px;
-  padding:5px 10px;cursor:pointer;transition:border-color .2s,color .2s}
+  padding:0.455em 0.909em;cursor:pointer;transition:border-color .2s,color .2s}
 #controller .body button:hover,#controller .body button:focus-visible,#controller select:focus-visible{border-color:#ffd98a;color:#fff6dc;outline:none;box-shadow:none}
 #controller .body button[aria-pressed="true"]{background:#d6d6d6;color:#000;border-color:#d6d6d6}
-#controller .trow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+#controller .trow{display:flex;flex-wrap:wrap;gap:0.727em 1.273em;align-items:center}
 #controller .trow .push{margin-left:auto}
-#controller .hs{display:flex;align-items:center;gap:8px}
-#controller .body > #more{display:flex;flex-direction:column;gap:14px;padding:14px 6px 0 0;border-top:1px solid #2a2a2a;flex:1 1 auto;min-height:0;overflow-y:auto}
-#controller:has(#more:not([hidden])) #picture{height:190px}
+#controller .hs{display:flex;align-items:center;gap:0.727em}
+#controller .body > #more{display:flex;flex-direction:column;gap:1.273em;padding:1.273em 0.545em 0 0;border-top:1px solid #2a2a2a;flex:1 1 auto;min-height:0;overflow-y:auto}
+#controller:has(#more:not([hidden])) #picture{height:17.273em}
 #more > *{flex:none}
 #controller .body > #more[hidden]{display:none}
-#controller .ms{display:grid;grid-template-columns:repeat(var(--n,8),minmax(0,1fr));gap:6px;height:72px;touch-action:none;cursor:ns-resize;user-select:none}
-#controller .ms.short{height:56px}
+#controller .ms{display:grid;grid-template-columns:repeat(var(--n,8),minmax(0,1fr));gap:0.545em;height:6.545em;touch-action:none;cursor:ns-resize;user-select:none}
+#controller .ms.short{height:5.091em}
 #controller .ms .b{position:relative;background:#0c0c0c;border:1px solid #222;border-radius:6px;overflow:hidden}
 #controller .ms .b:focus-visible{outline:1px solid #ffd98a}
 #controller .ms .b i{position:absolute;left:0;right:0;bottom:0;background:#cfcfcf;opacity:.85}
 #controller .ms .b.pend{border:1px dashed #ffd98a}
 #controller .ms .b.pend i{background:#ffd98a}
-#controller .ms .b span{position:absolute;left:0;right:0;top:3px;text-align:center;font-size:9px;color:#bbb;mix-blend-mode:difference}
+#controller .ms .b span{position:absolute;left:0;right:0;top:3px;text-align:center;font-size:0.818em;color:#bbb;mix-blend-mode:difference}
 #controller .ms .b .ft{top:auto;bottom:3px}
-#controller .tabs{display:flex;flex-wrap:wrap;gap:6px}
-#more section{display:flex;flex-direction:column;gap:10px}
+#controller .tabs{display:flex;flex-wrap:wrap;gap:0.545em}
+#more section{display:flex;flex-direction:column;gap:0.909em}
 #more section[hidden]{display:none}
-#lines{display:block;width:100%;height:150px;touch-action:none}
+#lines{display:block;width:100%;height:13.636em;touch-action:none}
 #selTxt{font-weight:400;color:#fff;letter-spacing:.12em}
-#controller .hs input{width:110px;accent-color:#d8d8d8;cursor:pointer}
-#controller .pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-#controller .pair .lab{margin-bottom:5px}
-#controller .ms .b span:not(.ft){font-size:8px}
+#controller .hs input{width:10em;accent-color:#d8d8d8;cursor:pointer}
+#controller .pair{display:grid;grid-template-columns:1fr 1fr;gap:1.455em}
+#controller .pair .lab{margin-bottom:0.455em}
+#controller .ms .b span:not(.ft){font-size:0.727em}
 #controller .lab[title]{cursor:help}
-#controller .body .tabs button{padding:4px 8px;font-size:9.5px}
+#controller .body .tabs button{padding:0.364em 0.727em;font-size:0.864em}
 #controller .readmore{color:#e8e8e8;text-decoration:none;border-bottom:1px solid #555;align-self:flex-start}
 #controller .readmore:hover,#controller .readmore:focus-visible{color:#ffd98a;border-color:#ffd98a;outline:none}
 #controller .ends{color:#8a8a8a}
-#controller .lab{font-size:10px;letter-spacing:.14em;color:#8a8a8a}
+#controller .lab{font-size:0.909em;letter-spacing:.14em;color:#8a8a8a}
 #mixTxt:not(:empty){color:#ffd98a;cursor:help}
 /* The harmony as a piano octave: seven white keys with five shorter black keys set between them.
    Bright = in the scale sounding now, whichever kind of key it is. Dot = the note it is on.
    Amber glass = home (it pulses while a change is waiting). */
-#controller .keys{display:grid;grid-template-columns:repeat(21,minmax(0,1fr));grid-template-rows:86px;gap:0 3px}
-#controller .body .keys button{grid-row:1;padding:0 0 6px;display:flex;align-items:flex-end;justify-content:center;font-size:10px;letter-spacing:0;
+#controller .keys{display:grid;grid-template-columns:repeat(21,minmax(0,1fr));grid-template-rows:7.818em;gap:0 3px}
+#controller .body .keys button{grid-row:1;padding:0 0 0.545em;display:flex;align-items:flex-end;justify-content:center;font-size:0.909em;letter-spacing:0;
   position:relative;background:#1f1f1f;border-color:#333;color:#666;transition:background .4s,color .4s,border-color .4s}
-#controller .body .keys button.black{height:58%;z-index:1;font-size:8px;padding-bottom:4px;background:#000;border-color:#444;color:#555}
+#controller .body .keys button.black{height:58%;z-index:1;font-size:0.727em;padding-bottom:0.364em;background:#000;border-color:#444;color:#555}
 #controller .body .keys button.in{background:#ececec;border-color:#ececec;color:#000}
 #controller .body .keys button.black.in{box-shadow:0 0 0 2px #000}
 #controller .body .keys button:hover{border-color:#ffd98a}
@@ -79,27 +81,27 @@
 #controller .body .keys button:active{transform:translateY(2px)}
 #controller .keys.wait button[aria-pressed="true"]{animation:tide-wait 1.2s ease-in-out infinite}
 @keyframes tide-wait{50%{box-shadow:inset 0 1px 0 rgba(255,244,210,.7), 0 0 0 1px rgba(255,222,150,.3), 0 0 4px rgba(255,200,90,.2)}}
-#controller .keys button.now::before{content:"";position:absolute;top:7px;left:50%;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:currentColor}
+#controller .keys button.now::before{content:"";position:absolute;top:0.636em;left:50%;width:0.545em;height:0.545em;margin-left:-3px;border-radius:50%;background:currentColor}
 #pendTxt:not(:empty){color:#ffd98a}
 /* of the two scale menus, the one sounding now is bright */
 #controller #colA,#controller #colB{color:#777}
 #controller #colA.on,#controller #colB.on{color:#fff;border-color:#e8e8e8}
 @media (max-width:600px){
-  #controller .strip{flex-wrap:wrap} #picture{height:210px}
+  #controller .strip{flex-wrap:wrap} #picture{height:19.091em}
   #controller .pair{grid-template-columns:1fr}
   #controller:has(#more:not([hidden])) #picture{display:none}   /* the knobs stay; the pad makes room */
 }
 
 /* touch screens: bigger targets */
 @media (pointer:coarse){
-  #controller .knob .dial{width:44px;height:44px}
-  #controller .knob .dial::after{top:5px;height:11px}
-  #controller .knob{font-size:9.5px;gap:5px}
-  #controller .body #presets button{padding:8px 12px}
-  #controller .body .tabs button{padding:8px 14px;font-size:11px}
-  #controller .body button,#controller select{padding:8px 12px}
-  #controller .body .keys button{padding:0 0 6px}
-  #lines{height:210px}
-  #controller .ms.short,#controller .ms{height:84px}
-  #controller .hs input{width:150px}
+  #controller .knob .dial{width:4em;height:4em}
+  #controller .knob .dial::after{top:0.455em;height:1em}
+  #controller .knob{font-size:0.864em;gap:0.455em}
+  #controller .body #presets button{padding:0.727em 1.091em}
+  #controller .body .tabs button{padding:0.727em 1.273em;font-size:1em}
+  #controller .body button,#controller select{padding:0.727em 1.091em}
+  #controller .body .keys button{padding:0 0 0.545em}
+  #lines{height:19.091em}
+  #controller .ms.short,#controller .ms{height:7.636em}
+  #controller .hs input{width:13.636em}
 }

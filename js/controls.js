@@ -100,7 +100,9 @@ NOTES.forEach((name, i) => $('tonic').add(new Option(name, i)));
   COLOUR_MENU.forEach(i => $(k).add(new Option(COLOURS[i], i)));
   $(k).addEventListener('change', e => { state[k] = +e.target.value; state.preset = -1; engine.send(k, state[k]); askGather(); drawPresets(); save(); });
 });
-$('tonic').addEventListener('change', e => { state.tonic = +e.target.value; engine.send('tonic', tonicOffset()); askGather(); save(); });
+$('tonic').addEventListener('change', e => { state.tonic = +e.target.value; engine.send('tonic', tonicOffset()); askGather(); showHome(); save(); });
+// while nothing is playing, the NOW ON box shows the home note: where the piece will begin
+export function showHome() { if (!live.playing) put('keyBox', NOTES[state.tonic]); }
 ['room', 'drift'].forEach(k => $(k).addEventListener('input', e => { state[k] = +e.target.value; engine.send(k, state[k]); showEditor(); save(); }));
 
 /* ---------- controller: rhythm and breath, one row per voice ---------- */
@@ -145,7 +147,7 @@ const drawWait = multislider($('msWait'), { arr: () => state.waits[state.divVoic
   onChange: (i, x) => { chosen.forEach(v => { state.waits[v][i] = x; engine.send(`wait${v}_${i}`, x); pending.wait.add(v); }); showPending(); save(); } });
 
 function showAll() {
-  showVol(); showBin(); showVoices(); drawPresets(); showRhythm();
+  showVol(); showBin(); showVoices(); drawPresets(); showRhythm(); showHome();
   $('room').value = state.room; $('drift').value = state.drift; $('tonic').value = state.tonic; $('colA').value = state.colA; $('colB').value = state.colB;
 }
 showAll();
