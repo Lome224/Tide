@@ -33,13 +33,13 @@ gaRevR init 0
 i 1 0 z
 i 3 0 z
 ; the seven machines start together and drift apart
-i 10 2 1 0
-i 10 2 1 1
-i 10 2 1 2
-i 10 2 1 3
-i 10 2 1 4
-i 10 2 1 5
-i 10 2 1 6
+i 10 0.3 1 0
+i 10 0.3 1 1
+i 10 0.3 1 2
+i 10 0.3 1 3
+i 10 0.3 1 4
+i 10 0.3 1 5
+i 10 0.3 1 6
 i 98 0 z
 i 99 0 z
 </CsScore>

@@ -11,6 +11,7 @@ let piece = 'tide', timer = null, t0 = 0, lastBits = 0;
 // own ENTER button, so the sound may begin later, once everything has loaded.
 let unlocked = null;
 hooks.restart = () => stop().then(start);
+hooks.leave = url => { const go = () => { location.href = url; }; live.playing ? stop().then(go, go) : go(); };
 
 /* ---------- play / pause ---------- */
 function setStatus(html) { $('status').innerHTML = html; }
@@ -43,6 +44,11 @@ async function stop() {
   setStatus('Paused. PLAY starts a new performance.');
 }
 $('play').addEventListener('click', () => live.playing ? stop() : start());
+
+// Leaving the page by any other way (a link, the back button): stop as well. Some browsers keep
+// a page in memory and bring it back as it was; a Csound left running comes back as noise.
+window.addEventListener('pagehide', () => { if (live.playing) stop(); });
+window.addEventListener('pageshow', e => { if (e.persisted && (live.playing || engine.isRunning())) stop(); });
 
 // for a host page
 window.Tide = {
@@ -102,6 +108,6 @@ function selectPiece(p) {
   $('pTest').textContent = p === 'test' ? 'BACK TO TIDE' : 'BINAURAL TEST';
   $('bin').disabled = p === 'test';
   if (live.playing) stop().then(start);
-  else setStatus(p === 'test' ? 'Binaural test: one source, four ways, about 50 s. Press PLAY.' : 'Starts quietly and fades in. Headphones recommended.');
+  else setStatus(p === 'test' ? 'Binaural test: one source, four ways, about 50 s. Press PLAY.' : 'Headphones recommended.');
 }
 if ($('pTest')) $('pTest').addEventListener('click', () => selectPiece(piece === 'test' ? 'tide' : 'test'));

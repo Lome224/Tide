@@ -31,8 +31,8 @@ endin
 instr 99
   kvol Ctl "vol", 0.8
   kvol port kvol, 0.25
-  ; slow 6 s fade-in so nobody is startled on arrival
-  kfade linseg 0, 6, 1
+  ; a 2 s fade-in: soon enough to hear that it has begun, slow enough not to startle
+  kfade linseg 0, 2, 1
   kbm Ctl "bin", 1
   kbm port kbm, 0.3
   aRL, aRR reverbsc gaRevL, gaRevR, 0.9 - 0.08*kbm, 7000 + 4000*kbm

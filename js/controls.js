@@ -9,8 +9,8 @@ import { picture } from './picture.js';
 import { lines } from './lines.js';
 import { CONTROLLER } from './markup.js';
 
-// one thing only main.js can do; it fills this in
-export const hooks = { restart() {} };
+// two things only main.js can do; it fills these in
+export const hooks = { restart() {}, leave(url) { location.href = url; } };
 
 export const $ = id => document.getElementById(id);
 // the controller's parts are written into the page first, so everything below can find them
@@ -190,10 +190,11 @@ if ($('moreTabs')) {
 // the detailed controls can sit behind a MORE button
 // Inside another site only the simple part is shown: MORE leads to Tide's own page, where the
 // full controller is. It opens in the same tab, so the browser's back button returns to the site.
+// The piece here is stopped completely first (hooks.leave), so it cannot come back broken.
 if (EMBED && $('moreBtn')) {
   $('moreBtn').textContent = 'MORE →';
   $('moreBtn').title = 'Open the full controller on Tide\'s own page';
-  $('moreBtn').addEventListener('click', () => { location.href = new URL('../#controller', import.meta.url).href; });
+  $('moreBtn').addEventListener('click', () => hooks.leave(new URL('../#controller', import.meta.url).href));
 } else if ($('moreBtn')) $('moreBtn').addEventListener('click', () => {
   const open = $('more').hidden;
   $('more').hidden = !open; $('moreBtn').setAttribute('aria-expanded', open ? 'true' : 'false');
