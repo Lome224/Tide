@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="controller.css">
 </head>
 <body>
 <main>
@@ -21,7 +22,6 @@
     <button id="play" class="glass" type="button">PLAY</button>
     <label class="hs glass" for="vol">VOLUME <input type="range" id="vol" min="0" max="1" step="0.01"><output id="volOut"></output></label>
   </div>
-  <div class="row presets" id="presets" role="group" aria-label="Sound"></div>
   <div>
     <div id="status">Starts quietly and fades in. Headphones recommended.</div>
     <div class="meter" aria-hidden="true"><i id="meter"></i></div>
@@ -35,67 +35,21 @@
     <button id="ctlBtn" class="glass" type="button" aria-expanded="false" aria-controls="controller">OPEN CONTROLLER</button>
   </div>
 
-  <!-- the full controller, opened from the front page -->
-  <div id="controller" hidden style="display:none;flex-direction:column;gap:24px">
-  <section class="panel" aria-label="Voices">
-    <h2>VOICES · EACH ON ITS OWN CYCLE</h2>
-    <div class="grid"><div class="lab">ON / OFF<span class="when">now</span></div><div class="cols" id="toggles"></div></div>
-    <div class="grid"><div class="lab">ACTIVITY<span class="when later">next phrase</span></div><div class="ms" id="msAct" style="--n:7" role="group" aria-label="Activity per voice"></div></div>
-    <div class="grid"><div class="lab">LEVEL<span class="when">now</span></div><div class="ms" id="msLvl" style="--n:7" role="group" aria-label="Level per voice"></div></div>
-    <p class="pendmsg" id="pendAct"></p>
-    <p class="hint">Drag across the bars like a Max multislider. A voice's button is underlined while it is
-      playing a phrase. Level is its volume in decibels (0 is as designed, the top is +12, the bottom is off)
-      and is heard at once. Activity is how many of the notes in its rhythm row it plays; a changed bar
-      turns yellow until that voice begins its next phrase, which is when the change is heard.</p>
-    <div class="row" style="margin-top:14px;gap:18px">
-      <label class="hs" for="tonic">ROOT <select id="tonic"></select><span class="when later">next silence</span></label>
-      <label class="hs" for="mood">HARMONY <select id="mood"></select><span class="when later">next silence</span></label>
+  <!-- the controller, opened from the front page. Its parts come from js/markup.js -->
+  <div id="controller" hidden style="display:none;flex-direction:column">
+    <div class="body" id="controllerBody"></div>
+    <div class="row extra">
+      <button id="pTest" type="button" aria-pressed="false">BINAURAL TEST</button>
+      <button id="codeBtn" type="button">CODE</button>
     </div>
-    <div class="row" style="margin-top:10px;gap:18px">
-      <label class="hs" for="drift" title="How much longer each voice's phrase is than the one before it">DRIFT
-        <span class="ends">together</span><input type="range" id="drift" min="0" max="1" step="0.01"><span class="ends">apart</span><span class="when later">next phrase</span></label>
-      <label class="hs" for="room" title="How much binaural room (early reflections + hrtfreverb tail)">ROOM
-        <span class="ends">dry</span><input type="range" id="room" min="0" max="1" step="0.01"><span class="ends">wet</span><span class="when">now</span></label>
-    </div>
-    <p class="hint">Changing the root or the harmony asks every voice to stop after its current phrase.
-      When they are all silent (about 20 seconds), the piece begins again in the new key.</p>
-  </section>
-
-  <section class="panel" aria-label="Rhythm">
-    <h2>RHYTHM · ONE PATTERN PER VOICE<span class="when later">next phrase</span></h2>
-    <div class="tabs" id="divTabs" role="group" aria-label="Voice for rhythm"></div>
-    <div class="ms short" id="msDiv" role="group" aria-label="Notes in each beat"></div>
-    <p class="pendmsg" id="pendDiv"></p>
-    <p class="hint" id="divHint"></p>
-  </section>
-
-  <section class="panel" aria-label="Breath">
-    <h2>BREATH · ONE PATTERN PER VOICE<span class="when later">next phrase</span></h2>
-    <div class="tabs" id="waitTabs" role="group" aria-label="Voice for breath"></div>
-    <div class="ms" id="msWait" role="group" aria-label="Rest after each phrase"></div>
-    <p class="pendmsg" id="pendWait"></p>
-    <p class="hint">Each bar is how long this voice rests after one of its phrases: bar 1 after its 1st,
-      and so on; after the 8th it starts again. Taller = longer (about 1 to 9 seconds).
-      A full bar reads WAIT: the voice stays silent until counter, bass and chords are all waiting.
-      Then the harmony changes and everyone begins again together.</p>
-  </section>
-
-  <div class="row">
-    <button id="pTest" type="button" aria-pressed="false">BINAURAL TEST</button>
-    <button id="codeBtn" type="button">CODE</button>
-  </div>
-  <pre id="code"></pre>
+    <pre id="code"></pre>
   </div>
 
   <section class="about">
     <p><b>Tide</b> is seven voices, each with its own cycle: a phrase, a rest, and again. The cycles
       are slightly different lengths, so the voices start together, drift apart, and now and then
       gather in a shared silence before starting again in a new key.</p>
-    <p>There are two kinds of harmony. One follows Debussy: everything is whole-tone or pentatonic,
-      changing only in a shared silence. The other is dark: polychords (a major triad set over a
-      root and fifth a tritone or a sixth away) moved as a constant structure, down a minor third
-      each time, inside the half-whole scale. In both, home moves from note to note, the bass
-      holds a pedal, and phrases end unresolved.</p>
+    <p>The harmony alternates between two scales, changing only in a shared silence. You choose the two from ten: the Dorian, Phrygian and Lydian modes, the whole-tone and octatonic scales, the Chinese pentatonic modes gong 宫, yu 羽 and jue 角, and the Japanese iwato 岩戸 and hirajoshi 平調子. In the octatonic scale the chords are polychords (a major triad set over a root and fifth a tritone or a sixth away) moved as a constant structure, down a minor third each time. In every scale, home moves from note to note, the bass holds a pedal, and phrases end unresolved.</p>
     <p>The pitched voices are physical models: a bowed string, a plucked string and an aeolian harp.
       <b>Drops</b> are water landing on glazed porcelain, <b>shimmer</b> is shards touching, the
       <b>waves</b> are filtered noise, and a <b>flyer</b> passes close with Doppler. With binaural

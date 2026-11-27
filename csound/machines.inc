@@ -54,7 +54,7 @@ instr 10
   ibl = irun/16
   iwv table iv*8 + iph % 8, giWaitT
   irest = 1 + 9*iwv
-  ; the page has changed the root or the mood: do not start a phrase. Wait, so the
+  ; the page has changed the root or the colours: do not start a phrase. Wait, so the
   ; shared silence comes as soon as the phrases now sounding have ended.
   ireq chnget "gather"
   igath = (ireq != giGatherDone ? 1 : 0)
@@ -93,7 +93,9 @@ instr 10
   id0 MotDeg 0
   ; chord tones: 2 to 4 by activity; a polychord needs both its structures
   ichn = (iact > 0.65 ? 4 : (iact > 0.25 ? 3 : 2)) + (giColour == 2 ? 1 : 0)
-  irow = (giColour == 2 ? 2 + giSection % 2 : giColour)
+  ; chord shapes: the octatonic colour has its two polychords, whole-tone its augmented
+  ; shape, and every other colour the stacked shape
+  irow = (giColour == 2 ? 2 + giSection % 2 : (giColour == 0 ? 0 : 1))
   ipos = 0
   icnt Onsets iv
   ipass = 0

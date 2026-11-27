@@ -3,12 +3,13 @@
 
 import { PIECES } from './config.js';
 
-const CSOUND_URL = 'https://cdn.jsdelivr.net/npm/@csound/browser@6.18.7/dist/csound.js';
 const RATES = [44100, 48000, 96000];
 
 // Tide's own files are found relative to this script, so the piece also works when the
 // page that shows it lives on another site.
 const BASE = new URL('..', import.meta.url).href;
+// Csound itself is kept with Tide (vendor/csound.js), so nothing is fetched from anyone else's server
+const CSOUND_URL = BASE + 'vendor/csound.js';
 
 const fetchText = url => fetch(BASE + url).then(r => { if (!r.ok) throw new Error(url); return r.text(); });
 

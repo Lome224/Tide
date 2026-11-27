@@ -4,8 +4,8 @@
 ; Voices: 0 counter, 1 bass, 2 chords, 3 drops, 4 waves, 5 shimmer, 6 flyer.
 ; Each voice is driven by its own machine (instr 10): it plays a phrase, rests, and
 ; starts again, on its own cycle. What all voices share is the harmony:
-;   colour  whole-tone and pentatonic (mood 0, after Debussy), or the half-whole
-;           scale (mood 1, dark, after Berklee Harmony 4). It changes only when the
+;   colour  one of ten scales. Two of them are chosen (on the page: colA and colB)
+;           and the piece alternates between the two. It changes only when the
 ;           three pitched voices are all waiting, never during a phrase.
 ;   set     the notes of the current colour, as semitones above the tonic
 ;   root    which note of the set is "home" for now. It moves when the counter
@@ -16,9 +16,16 @@
 giSet ftgen 0, 0, -8, -2, 0, 2, 4, 7, 9, 0, 0, 0
 giSetN init 5
 giColour init 0
-; the three colours: whole-tone (6 notes), pentatonic (5), half-whole (8)
-giSets ftgen 0, 0, -24, -2, 0, 2, 4, 6, 8, 10, 0, 0,  0, 2, 4, 7, 9, 0, 0, 0,  0, 1, 3, 4, 6, 7, 9, 10
-giSetNs ftgen 0, 0, -3, -2, 6, 5, 8
+; the ten colours, one row of 8 each, as semitones above the tonic:
+;   0 whole-tone (the set a semitone above the tonic)   1 gong (pentatonic)
+;   2 octatonic (half-whole)   3 dorian   4 phrygian   5 lydian
+;   6 yu   7 jue   8 iwato   9 hirajoshi
+giSets ftgen 0, 0, -80, -2, 1, 3, 5, 7, 9, 11, 0, 0,  0, 2, 4, 7, 9, 0, 0, 0,  0, 1, 3, 4, 6, 7, 9, 10, \
+                           0, 2, 3, 5, 7, 9, 10, 0,  0, 1, 3, 5, 7, 8, 10, 0,  0, 2, 4, 6, 7, 9, 11, 0, \
+                           0, 3, 5, 7, 10, 0, 0, 0,  0, 3, 5, 8, 10, 0, 0, 0,  0, 1, 5, 6, 10, 0, 0, 0,  0, 2, 3, 7, 8, 0, 0, 0
+giSetNs ftgen 0, 0, -10, -2, 6, 5, 8, 7, 7, 7, 5, 5, 5, 5
+; which of the two chosen colours is sounding: 0 = colA, 1 = colB
+giSide init 1
 giSection init 0
 giTonic init 0
 giShift init 0
@@ -81,12 +88,16 @@ opcode MotDeg, i, i
   xout id + int(inum/8)
 endop
 
-; a new section. Mood 0 alternates whole-tone and pentatonic; mood 1 is the
-; half-whole scale. The key moves by a semitone or a minor third.
+; a new section: the other of the two chosen colours (without a page: gong, then
+; whole-tone). The key moves by a semitone or a minor third.
 opcode NewSection, 0, 0
   giSection = giSection + 1
-  imood CtlI "mood", 0
-  giColour = (imood > 0.5 ? 2 : (giColour == 1 ? 0 : 1))
+  ireq chnget "gather"
+  ; a change made on the page begins with its first colour
+  giSide = (ireq != giGatherDone ? 0 : 1 - giSide)
+  ia CtlI "colA", 1
+  ib CtlI "colB", 0
+  giColour = int(limit(giSide == 0 ? ia : ib, 0, 9))
   giSetN table giColour, giSetNs
   ik = 0
   while ik < 8 do
@@ -96,7 +107,6 @@ opcode NewSection, 0, 0
   od
   ; the key moves by itself at each section, unless the page has just asked for a
   ; change: then the root chosen there is used exactly
-  ireq chnget "gather"
   if ireq != giGatherDone then
     giShift = 0
   elseif giSection > 1 then
@@ -109,7 +119,7 @@ opcode NewSection, 0, 0
   giTonic = itn - 12*floor((itn + 5)/12)
   giRootIdx = 0
   giChPos = 0
-  ; a change of root or mood on the page asks everyone to gather; this answers it
+  ; a change of root or colours on the page asks everyone to gather; this answers it
   giGatherDone = ireq
   chnset giColour, "colour_now"
   chnset giTonic, "tonic_now"

@@ -6,7 +6,9 @@
 //   min, max, step
 //   fmt(v)     label for a value          name(i)   accessible name of bar i
 //   onChange(i, v)  called when bar i changes
-//   foot       true to number the bars    dim(i), pend(i)  optional: grey / mark as pending
+//   foot       true to number the bars, or a list of names for them
+//   reset      optional: the value a double-click returns a bar to
+//   dim(i), pend(i)  optional: grey / mark as pending
 // Returns draw(), to call when the list was changed from outside.
 export function multislider(el, o) {
   const bars = o.arr().map((_, i) => {
@@ -14,7 +16,7 @@ export function multislider(el, o) {
     b.className = 'b'; b.tabIndex = 0;
     b.setAttribute('role', 'slider'); b.setAttribute('aria-label', o.name(i));
     b.setAttribute('aria-valuemin', o.min); b.setAttribute('aria-valuemax', o.max);
-    b.innerHTML = '<i></i><span></span>' + (o.foot ? `<span class="ft">${i + 1}</span>` : '');
+    b.innerHTML = '<i></i><span></span>' + (o.foot ? `<span class="ft">${Array.isArray(o.foot) ? o.foot[i] : i + 1}</span>` : '');
     b.addEventListener('keydown', e => {
       const d = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1 }[e.key];
       if (d) { e.preventDefault(); set(i, o.arr()[i] + d * (o.step >= 1 ? o.step : 0.05)); }
@@ -60,6 +62,10 @@ export function multislider(el, o) {
   el.addEventListener('pointermove', e => { if (dragging) at(e); });
   el.addEventListener('pointerup', () => { dragging = false; });
   el.addEventListener('pointercancel', () => { dragging = false; });
+  if (o.reset !== undefined) el.addEventListener('dblclick', e => {
+    const r = el.getBoundingClientRect();
+    set(Math.max(0, Math.min(n - 1, Math.floor((e.clientX - r.left) / r.width * n))), o.reset);
+  });
   return draw;
 }
 
