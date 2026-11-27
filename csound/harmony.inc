@@ -63,6 +63,10 @@ giWaitT ftgen 0, 0, -64, -2, 0
 ; scratch lists filled by Onsets: where each note starts, and how long it is (in beats)
 giOn ftgen 0, 0, -32, -2, 0
 giLen ftgen 0, 0, -32, -2, 0
+; giGen: 0 to 6, a number for each voice that moves on when its machine is retired, so that
+; what the old machine had planned is ignored; 7, the last gather request answered (so it
+; can be read while playing); 8, how far the chords have moved in their current phrase
+giGen ftgen 0, 0, -16, -2, 0
 ; how many phrases each voice has played
 giPhN ftgen 0, 0, -8, -2, 0
 ; each machine's state, for the other instruments and for the page
@@ -121,6 +125,7 @@ opcode NewSection, 0, 0
   giChPos = 0
   ; a change of root or colours on the page asks everyone to gather; this answers it
   giGatherDone = ireq
+  tableiw ireq, 7, giGen
   chnset giColour, "colour_now"
   chnset giTonic, "tonic_now"
   chnset giSection, "section_now"

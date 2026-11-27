@@ -24,14 +24,14 @@ export const EMBED = document.documentElement.hasAttribute('data-tide-embed');
 export const sendVol = () => engine.send('vol', live.quiet ? 0 : state.vol);
 
 /* ---------- changes waiting to be heard ----------
-   Controls marked "next phrase" are read by a voice when its phrase begins, so a change
-   stays pending (yellow) until that voice begins its next phrase. */
-export const pending = { act: new Set(), div: new Set(), wait: new Set() };
+   Density and rhythm are heard from the next beat. A voice's rests are read when its phrase
+   begins, so a change there stays pending (yellow) until that voice's next phrase. */
+export const pending = { wait: new Set() };
 const isPending = (kind, v) => live.playing && pending[kind].has(v);
 
 export function showPending() {
   // for the chosen voices: say that a change is waiting, since it is not heard at once
-  put('pendTxt', live.playing && [...chosen].some(v => pending.act.has(v) || pending.div.has(v) || pending.wait.has(v)) ? 'next phrase' : '');
+  put('pendTxt', live.playing && [...chosen].some(v => pending.wait.has(v)) ? 'rests: next phrase' : '');
   drawDiv(); drawWait();
 }
 
@@ -61,7 +61,7 @@ function applyPreset(i) {
     act: VOICES.map(() => p.act),
     // every rest longer by `slower`; a WAIT bar stays a WAIT bar
     waits: WAIT0.map(row => row.map(x => x >= 0.95 ? x : Math.min(0.9, x + p.slower))) });
-  VOICES.forEach((_, v) => { pending.act.add(v); pending.wait.add(v); });
+  VOICES.forEach((_, v) => pending.wait.add(v));
   const ch = allChannels();
   for (const k in ch) if (k !== 'gather' && k !== 'vol') engine.send(k, ch[k]);
   if (pairChanged) askGather();
@@ -88,7 +88,7 @@ $('density').addEventListener('input', e => {
   const by = +e.target.value - state.act.reduce((a, x) => a + x, 0) / state.act.length;
   VOICES.forEach((_, v) => {
     state.act[v] = Math.max(0, Math.min(1, Math.round((state.act[v] + by) * 100) / 100));
-    engine.send('act' + v, state.act[v]); pending.act.add(v);
+    engine.send('act' + v, state.act[v]);
   });
   showPending(); showEditor(); save();
 });
@@ -106,8 +106,8 @@ $('tonic').addEventListener('change', e => { state.tonic = +e.target.value; engi
 /* ---------- controller: rhythm and breath, one row per voice ---------- */
 export const chosen = new Set([state.divVoice]);
 const drawDiv = multislider($('msDiv'), { arr: () => state.divs[state.divVoice], min: 0, max: 4, step: 1,
-  fmt: v => v ? v : '—', name: i => 'beat ' + (i + 1), foot: true, pend: () => isPending('div', state.divVoice),
-  onChange: (i, x) => { chosen.forEach(v => { state.divs[v][i] = x; engine.send(`div${v}_${i}`, x); pending.div.add(v); }); showPending(); save(); } });
+  fmt: v => v ? v : '—', name: i => 'beat ' + (i + 1), foot: true,
+  onChange: (i, x) => { chosen.forEach(v => { state.divs[v][i] = x; engine.send(`div${v}_${i}`, x); }); save(); } });
 // The chosen voices. The rows show the first of them; a change to notes, rhythm or rests is
 // written to every one, so several voices can be shaped in one move.
 function selectVoice(v, add) {
@@ -127,7 +127,7 @@ function showEditor() {
   $('notes').value = state.act[v];
 }
 $('notes').addEventListener('input', e => {
-  chosen.forEach(v => { state.act[v] = +e.target.value; engine.send('act' + v, state.act[v]); pending.act.add(v); });
+  chosen.forEach(v => { state.act[v] = +e.target.value; engine.send('act' + v, state.act[v]); });
   showVoices(); showPending(); save();
 });
 $('selAll').addEventListener('click', () => {

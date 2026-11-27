@@ -84,7 +84,7 @@ async function tick() {
   showKeys((((Math.round(tonic) + 2) % 12) + 12) % 12, Math.round(colour));
   const key = `<b>${colourName}</b> on <b>${note}</b>`;
   $('now').innerHTML = gather.waiting
-    ? key + ' · <span style="color:var(--glow)">changing at the next silence</span>'
+    ? key + ' · <span style="color:var(--glow)">changing…</span>'
     : key + ((bits & 7) === 0 && t > 3 ? ' · counter, bass and chords are silent' : '');
 }
 

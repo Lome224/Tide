@@ -63,10 +63,10 @@ Seven voices: counter (bowed string, `wgbow`), bass (plucked string, `wgpluck2`)
 - **Breath:** each voice's breath row sets its rest after each of 8 phrases. A full bar means wait: the voice stays silent until counter, bass and chords are all waiting.
 - **Harmony:** everything is in one scale at a time. Two scales are chosen from ten (`colA`, `colB`) and the piece alternates between them. Chords are one shape moved in parallel.
 - **Octatonic chords** (after Berklee *Harmony 4*, parts 5 and 6): polychords, root and fifth below, a close major triad above, on the tritone or the sixth. They move as a constant structure, down a minor third each time; the octatonic scale is the same at every minor third, so the chord scale stays constant. The pattern is broken on the last chord before a shared silence.
-- **Sections:** only when the three pitched voices are all waiting does the harmony change to the other of its two scales, in a new key, and everyone begins again together. Changing the root or harmony on the page asks every voice to stop after its current phrase, so that silence comes within about 20 seconds; the chosen root is then used exactly.
+- **Sections:** only when the three pitched voices are all waiting does the harmony change to the other of its two scales, in a new key, and everyone begins again together. Changing the root or the scales on the page retires every voice at once and puts it to wait, so that silence comes within a few seconds; the chosen root is then used exactly.
 - **Home:** within a section, home moves when the counter starts a phrase. The move (step up, step down, skip up) is drawn from a Markov chain on the previous move (`giMarkov`). In dark mode a step is a minor third and a skip a tritone. The bass holds a pedal; phrases end on the 2nd or the note below home.
 - **Motif:** there is no melody. The counter plays an 8-note motif (upside down) that changes a little between phrases.
-- **Frozen inputs:** a voice reads its rhythm row, breath row and activity when its phrase begins. On the page a changed bar stays yellow until then.
+- **When a change is heard:** each beat of a phrase reads its voice's rhythm row and activity as it arrives, so those are heard from the next beat. A voice's breath row and the drift are read when its phrase begins; on the page a changed rest stays yellow until then.
 
 ## Channels
 
