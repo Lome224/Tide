@@ -27,7 +27,8 @@ It extends the system of *The Blue Left Spinning*: each voice stands where a scu
 | `js/markup.js` | The controller's parts, as HTML. Written into the page by `main.js`. |
 | `js/picture.js` | The pad: density, drift and room as one picture you can drag. |
 | `js/lines.js` | The voices as lines: on/off, level, and choosing which voices to edit. |
-| `js/main.js` | Connects the controls to the state and the engine. |
+| `js/controls.js` | Writes the controller into the page and connects every control to the state and the engine. |
+| `js/main.js` | Playing: start, stop, the running display, and the commands a host page can use. |
 
 **The piece** (`csound/`; run it on its own with `csound tide.csd` from that folder)
 

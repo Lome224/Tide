@@ -10,6 +10,11 @@ if (PHONE) { state.bin = 0; state.on[5] = state.on[6] = 0; }
 try { Object.assign(state, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
 export function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
 
+// What is happening now (not saved). quiet: a host page has asked for silence. lite: the light
+// engine (no binaural processing, about a third of the work) is running; it is chosen when a
+// performance starts with binaural off, so turning binaural on then needs a fresh start.
+export const live = { playing: false, quiet: false, lite: 0 };
+
 // Root and harmony are read by the piece at a shared silence. The page asks for one by
 // raising this number; `waiting` is true until the piece answers with a new section.
 export const gather = { sent: 0, section: -1, waiting: false };
