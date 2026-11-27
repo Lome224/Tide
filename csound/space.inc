@@ -1,4 +1,4 @@
-; Tide, part 1 of 7: the binaural space (HRTF data, the room buses)
+; Tide, part 1 of 9: the binaural space (HRTF data, the room buses)
 
 ; ---------- binaural (HRTF) ----------
 ; Measured head-related transfer functions (Csound's data set for the running

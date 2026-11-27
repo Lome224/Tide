@@ -37,8 +37,10 @@ It extends the system of *The Blue Left Spinning*: each voice stands where a scu
 | `tide.csd` | The main file: options, the seven includes, and the score that starts everything. |
 | `space.inc` | The binaural space: HRTF data, the room buses. |
 | `controls.inc` | Reading the page's controls, voice gain, placing a sound around the head. |
-| `harmony.inc` | The shared harmony: the three colours, chord shapes, the motif, sections, the Markov table, default rhythm and breath rows. |
+| `rhythm.inc` | Each voice's rhythm and rest rows, the routines that read them, and what the machines share. |
+| `harmony.inc` | The shared harmony: the ten scales, chord shapes, the motif, sections, the Markov table. |
 | `machines.inc` | The conductor, and the machine that gives each voice its phrases and rests. |
+| `beats.inc` | One beat of a phrase: where the notes are chosen. |
 | `voices-pitched.inc` | Chords, bass, counter. |
 | `voices-texture.inc` | Drops, waves, shimmer, flyer. |
 | `output.inc` | The binaural room and the master output. |

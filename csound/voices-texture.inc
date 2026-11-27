@@ -1,4 +1,4 @@
-; Tide, part 6 of 7: the textures (drops, waves, shimmer, flyer)
+; Tide, part 8 of 9: the textures (drops, waves, shimmer, flyer)
 
 ; ---------- drops: water on glazed porcelain ----------
 ; A drop lands: a soft wet tick (a tiny bubble and a breath of noise), and that
@@ -33,7 +33,7 @@ instr 2
   am4 mode atick, if4, 0.455*if4*0.09
   kvg VGain 3
   asig = (atick*0.5 + (am1 + am2*0.6 + am3*0.4 + am4*0.25)) * iamp * 2.5 * kvg
-  Place asig*(0.55 + 1.1*inear), iaz, kel, (iaz < 180 ? 0.65 : 0.35), 0.35 + 0.9*inear, 0.9 - 0.7*inear, 0.6 + 0.8*(1 - inear)
+  Place asig*(0.55 + 1.1*inear), iaz, kel, (iaz < 180 ? 0.65 : 0.35), 0.35 + 0.9*inear, 0.9 - 0.7*inear, 0.6 + 0.8*(1 - inear), 1, 1.4
 endin
 
 ; ---------- water: band-passed noise breathing like waves ----------
@@ -101,24 +101,8 @@ instr 5
   ahi buthp agr, 5000
   kvg VGain 5
   asig = (ar1*0.6 + ar2*0.3 + ahi*0.25) * aenv * 0.1 * kvg
-  kbin Ctl "bin", 1
-  kbin port kbin, 0.3
-  ; stereo: follow the same circle with a simple pan
-  kpan = 0.5 + 0.45*sin(kaz*$M_PI/180)
-  aSL, aSR pan2 asig*0.6, kpan
-  if giLite == 1 then
-    aBL = aSL
-    aBR = aSR
-  else
-    aBL, aBR hrtfmove2 asig, kaz, kel, gSHL, gSHR, 4, 9, sr
-  endif
-  RoomSend asig, kaz, 0.8*kbin
-  aL = aSL*(1-kbin) + aBL*kbin*1.4
-  aR = aSR*(1-kbin) + aBR*kbin*1.4
-  gaDryL = gaDryL + aL*0.7
-  gaDryR = gaDryR + aR*0.7
-  gaRevL = gaRevL + aL*0.25
-  gaRevR = gaRevR + aR*0.25
+  ; in stereo it follows the same circle with a simple pan
+  Place asig, kaz, kel, 0.5 + 0.45*sin(kaz*$M_PI/180), 0.7, 0.25, 0.8, 0.6, 1.4
 endin
 
 ; ---------- flyer: a small bright creature passing by, with Doppler ----------
@@ -157,21 +141,5 @@ instr 6
   aenv linseg 0, 0.4, 1, p3-0.8, 1, 0.4, 0
   kvg VGain 6
   asig = asrc * aenv * 0.16 / kd * kvg
-  kbin Ctl "bin", 1
-  kbin port kbin, 0.3
-  kpan = 0.5 + 0.5*kx/sqrt(kx*kx + 4)
-  aSL, aSR pan2 asig*0.7, kpan
-  if giLite == 1 then
-    aBL = aSL
-    aBR = aSR
-  else
-    aBL, aBR hrtfmove2 asig, kaz, kel, gSHL, gSHR, 4, 9, sr
-  endif
-  RoomSend asig, kaz, 0.25*kbin
-  aL = aSL*(1-kbin) + aBL*kbin*1.4
-  aR = aSR*(1-kbin) + aBR*kbin*1.4
-  gaDryL = gaDryL + aL*0.8
-  gaDryR = gaDryR + aR*0.8
-  gaRevL = gaRevL + aL*0.15
-  gaRevR = gaRevR + aR*0.15
+  Place asig, kaz, kel, 0.5 + 0.5*kx/sqrt(kx*kx + 4), 0.8, 0.15, 0.25, 0.7, 1.4
 endin

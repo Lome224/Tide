@@ -1,4 +1,4 @@
-; Tide, part 7 of 7: the binaural room and the master output
+; Tide, part 9 of 9: the binaural room and the master output
 
 ; ---------- room: binaural early reflections + late tail ----------
 ; Listener stands in the middle of a 10 x 10 x 3 m room (+x = right, +y = ahead);

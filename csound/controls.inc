@@ -1,4 +1,4 @@
-; Tide, part 2 of 7: reading the page's controls, voice gain, placing a sound
+; Tide, part 2 of 9: reading the page's controls, voice gain, placing a sound
 
 ; ---------- controls ----------
 ; The page sets every channel and then "ui" = 1. Until then (and whenever this file
@@ -31,14 +31,18 @@ opcode VGain, k, i
   xout kg
 endop
 
-; place a sound at azimuth/elevation: binaural (HRTF + room) or plain stereo pan
-opcode Place, 0, akkkkkk
-  asig, kaz, kel, kpan, kdry, kwet, kroom xin
+; Place a sound: binaurally at azimuth kaz and elevation kel (HRTF, plus a send to the
+; binaural room), or as a plain stereo pan at kpan when binaural is off. Every voice ends here.
+;   kdry, kwet   how much goes to the direct mix and to the reverb
+;   kroom        how much goes to the binaural room
+;   kst, kbg     level of the stereo version, and of the binaural one
+opcode Place, 0, akkkkkkkk
+  asig, kaz, kel, kpan, kdry, kwet, kroom, kst, kbg xin
   kbin Ctl "bin", 1
   kbin port kbin, 0.3
   kaz wrap kaz, 0, 360
   kpan limit kpan, 0, 1
-  aSL, aSR pan2 asig, kpan
+  aSL, aSR pan2 asig*kst, kpan
   if giLite == 1 then
     aBL = aSL
     aBR = aSR
@@ -46,8 +50,8 @@ opcode Place, 0, akkkkkk
     aBL, aBR hrtfmove2 asig, kaz, kel, gSHL, gSHR, 4, 9, sr
   endif
   RoomSend asig, kaz, kroom*kbin
-  aL = aSL*(1-kbin) + aBL*kbin*1.4
-  aR = aSR*(1-kbin) + aBR*kbin*1.4
+  aL = aSL*(1-kbin) + aBL*kbin*kbg
+  aR = aSR*(1-kbin) + aBR*kbin*kbg
   gaDryL = gaDryL + aL*kdry
   gaDryR = gaDryR + aR*kdry
   gaRevL = gaRevL + aL*kwet

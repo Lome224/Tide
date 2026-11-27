@@ -1,4 +1,4 @@
-; Tide, part 5 of 7: the pitched voices (chords, bass, counter)
+; Tide, part 7 of 9: the pitched voices (chords, bass, counter)
 
 ; ---------- chords: slow sine chord tones that swell and fade (scheduled by phrases) ----------
 instr 4
@@ -40,20 +40,7 @@ instr 4
   aair butbp aair, ifreq*8, ifreq*1.5
   aair = aair * (0.5 + 0.5*ktone) * 0.35 * kbin
   asig = (a1*1.6 + a3*0.5*(0.6 + ktone) + aair) * aenv * 0.022 * kvg
-  aSL, aSR pan2 asig, kpan
-  if giLite == 1 then
-    aBL = aSL
-    aBR = aSR
-  else
-    aBL, aBR hrtfmove2 asig, kaz, iel, gSHL, gSHR, 4, 9, sr
-  endif
-  RoomSend asig, kaz, 0.7*kbin
-  aL = aSL*(1-kbin) + aBL*kbin*1.25
-  aR = aSR*(1-kbin) + aBR*kbin*1.25
-  gaDryL = gaDryL + aL*0.6
-  gaDryR = gaDryR + aR*0.6
-  gaRevL = gaRevL + aL*0.5
-  gaRevR = gaRevR + aR*0.5
+  Place asig, kaz, iel, kpan, 0.6, 0.5, 0.7, 1, 1.25
 endin
 
 ; ---------- bass: a long low string, plucked ----------
@@ -88,5 +75,5 @@ instr 9
   abow dcblock2 abow
   kvg VGain 0
   asig = abow*aenv*p5*kvg*1.1
-  Place asig, gkCntAz, 0, 0.5 + 0.4*sin(gkCntAz*$M_PI/180), 0.55, 0.6, 0.9
+  Place asig, gkCntAz, 0, 0.5 + 0.4*sin(gkCntAz*$M_PI/180), 0.55, 0.6, 0.9, 1, 1.4
 endin

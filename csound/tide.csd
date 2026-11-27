@@ -17,12 +17,14 @@ gaDryR init 0
 gaRevL init 0
 gaRevR init 0
 
-; The piece is in seven parts, in the files beside this one.
+; The piece is in nine parts, in the files beside this one.
 ; Run it from this folder:  csound tide.csd
 #include "space.inc"
 #include "controls.inc"
+#include "rhythm.inc"
 #include "harmony.inc"
 #include "machines.inc"
+#include "beats.inc"
 #include "voices-pitched.inc"
 #include "voices-texture.inc"
 #include "output.inc"
