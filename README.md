@@ -44,6 +44,8 @@ It extends the system of *The Blue Left Spinning*: each voice stands where a scu
 | `lab/binaural-test-web.csd`, `lab/binaural-test.csd` | The isolated binaural A/B test (browser version, and a self-contained version with HRTF data embedded) |
 | `media/hrtf/` | Csound's measured HRTF data (44.1, 48, 96 kHz) |
 
+The current piece lives in `csound/`. The `lab/` folder contains only the two binaural tests. Older experimental snapshots remain in Git history rather than alongside the current source; use `git log --all -- lab/` to find them.
+
 In the browser, `js/engine.js` fetches `tide.csd` and its parts and joins them before handing the text to Csound.
 
 ## How the piece works
