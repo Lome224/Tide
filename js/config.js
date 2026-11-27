@@ -44,7 +44,7 @@ export const PRESETS = [
 
 export const DEFAULTS = { vol: 0.35, bin: 1, room: 0.5, drift: 0.5, tonic: 2, colA: 1, colB: 0, preset: 0,
   on: VOICES.map(() => 1), act: VOICES.map(() => 0.5), lvl: VOICES.map(() => 0.5),
-  divs: DIV0.map(r => r.slice()), waits: WAIT0.map(r => r.slice()), divVoice: 0, waitVoice: 0 };
+  divs: DIV0.map(r => r.slice()), waits: WAIT0.map(r => r.slice()), divVoice: 0 };
 
 export const DIV_HINT = [
   'Counter: the rhythm of its motif. 1 to 4 = that many notes in the beat; — at the start is silence, later it holds the note before.',

@@ -26,18 +26,14 @@ const sendVol = () => engine.send('vol', quiet ? 0 : state.vol);
 
 /* ---------- changes waiting to be heard ----------
    Controls marked "next phrase" are read by a voice when its phrase begins, so a change
-   stays pending (yellow) until that voice's button lights up again. */
+   stays pending (yellow) until that voice begins its next phrase. */
 const pending = { act: new Set(), div: new Set(), wait: new Set() };
 const isPending = (kind, v) => playing && pending[kind].has(v);
 
 function showPending() {
-  const names = set => [...set].map(v => voiceNames[v]).join(', ');
-  put('pendAct', playing && pending.act.size ? `Waiting for the next phrase of: ${names(pending.act)}` : '');
-  put('pendDiv', isPending('div', state.divVoice) ? `${voiceNames[state.divVoice]} will play this from its next phrase` : '');
-  put('pendWait', isPending('wait', state.waitVoice) ? `${voiceNames[state.waitVoice]} will use this from its next phrase` : '');
   // for the chosen voices: say that a change is waiting, since it is not heard at once
-  put('pendTxt', playing && [...chosen].some(v => pending.act.has(v) || pending.div.has(v) || pending.wait.has(v)) ? 'heard from the next phrase' : '');
-  drawAct(); drawDiv(); drawWait();
+  put('pendTxt', playing && [...chosen].some(v => pending.act.has(v) || pending.div.has(v) || pending.wait.has(v)) ? 'next phrase' : '');
+  drawDiv(); drawWait();
 }
 
 // root and harmony: ask every voice to stop after its phrase, so the piece can begin again
@@ -76,36 +72,19 @@ const drawPresets = tabs($('presets'), PRESETS.map(p => p.name), () => state.pre
 [...$('presets').children].forEach((b, i) => { b.title = PRESETS[i].title; });
 
 /* ---------- controller: voices ---------- */
-const togBtns = VOICES.map(([name, short], v) => {
-  const b = document.createElement('button');
-  b.type = 'button'; b.className = 'vbtn';
-  b.innerHTML = `<span class="long">${name}</span><span class="short">${short}</span>`;
-  b.setAttribute('aria-label', name.toLowerCase());
-  b.addEventListener('click', () => {
-    state.on[v] = state.on[v] ? 0 : 1; state.preset = -1;
-    engine.send('on' + v, state.on[v]); showVoices(); drawPresets(); save();
-  });
-  if ($('toggles')) $('toggles').appendChild(b);
-  return b;
-});
+function toggleVoice(v) {
+  state.on[v] = state.on[v] ? 0 : 1; state.preset = -1;
+  engine.send('on' + v, state.on[v]); showVoices(); drawPresets(); save();
+}
 
 // level is a volume: gain = (2 × value)², shown in decibels
 const dB = v => v <= 0 ? 'off' : (v === 0.5 ? '0' : (v > 0.5 ? '+' : '') + Math.round(40 * Math.log10(2 * v)));
 
-const drawAct = !$('msAct') ? () => {} : multislider($('msAct'), { arr: () => state.act, min: 0, max: 1, step: 0.01,
-  fmt: v => Math.round(v * 100), name: v => voiceNames[v].toLowerCase() + ' activity', foot: VOICES.map(v => v[1]),
-  dim: v => !state.on[v], pend: v => isPending('act', v),
-  onChange: (v, x) => { engine.send('act' + v, x); pending.act.add(v); showPending(); save(); } });
-const drawLvl = !$('msLvl') ? () => {} : multislider($('msLvl'), { arr: () => state.lvl, min: 0, max: 1, step: 0.01,
-  fmt: dB, name: v => voiceNames[v].toLowerCase() + ' level', dim: v => !state.on[v], reset: 0.5,
-  onChange: (v, x) => { engine.send('lvl' + v, x); save(); } });
 function showVoices() {
-  togBtns.forEach((b, v) => b.setAttribute('aria-pressed', state.on[v] ? 'true' : 'false'));
-  drawAct(); drawLvl();
-  if ($('density')) $('density').value = state.act.reduce((a, x) => a + x, 0) / state.act.length;
+  $('density').value = state.act.reduce((a, x) => a + x, 0) / state.act.length;
 }
 // density: one control that raises or lowers every voice's activity together
-if ($('density')) $('density').addEventListener('input', e => {
+$('density').addEventListener('input', e => {
   // every voice moves by the same amount, so differences made voice by voice are kept
   const by = +e.target.value - state.act.reduce((a, x) => a + x, 0) / state.act.length;
   VOICES.forEach((_, v) => {
@@ -136,41 +115,38 @@ function selectVoice(v, add) {
   if (!add) { chosen.clear(); chosen.add(v); }
   else if (chosen.has(v) && chosen.size > 1) chosen.delete(v);
   else chosen.add(v);
-  state.divVoice = state.waitVoice = Math.min(...chosen);
-  showRhythm(); drawWaitTabs(); save();
+  state.divVoice = Math.min(...chosen);
+  showRhythm(); save();
 }
-const drawDivTabs = $('divTabs') ? tabs($('divTabs'), voiceNames, () => state.divVoice, v => selectVoice(v)) : () => {};
-// what the page shows about the chosen voices (where it has these parts)
+// what the page shows about the chosen voices
 function showEditor() {
   const v = state.divVoice;
   put('selTxt', chosen.size === VOICES.length ? 'ALL VOICES' : [...chosen].sort().map(x => voiceNames[x]).join(' + '));
   const same = f => [...chosen].every(x => JSON.stringify(f(x)) === JSON.stringify(f(v)));
   put('mixTxt', same(x => [state.act[x], state.divs[x], state.waits[x]]) ? '' : 'mixed');
   put('phraseTxt', (chosen.size === 1 ? VOICES[v][2] + ' · ' : '') + `phrase ${Math.round(13 + 2.4 * state.drift * v)} beats`);   // the same sum as in csound/machines.inc
-  if ($('notes')) $('notes').value = state.act[v];
+  $('notes').value = state.act[v];
 }
-if ($('notes')) $('notes').addEventListener('input', e => {
+$('notes').addEventListener('input', e => {
   chosen.forEach(v => { state.act[v] = +e.target.value; engine.send('act' + v, state.act[v]); pending.act.add(v); });
   showVoices(); showPending(); save();
 });
-if ($('selAll')) $('selAll').addEventListener('click', () => {
+$('selAll').addEventListener('click', () => {
   VOICES.forEach((_, v) => chosen.add(v));
-  state.divVoice = state.waitVoice = 0; showRhythm(); drawWaitTabs(); save();
+  state.divVoice = 0; showRhythm(); save();
 });
 function showRhythm() {
-  drawDivTabs(); showPending(); showEditor();
-  const hint = '8 beats, played twice in each phrase, left to right. ' + DIV_HINT[state.divVoice];
-  put('divHint', hint); if ($('divLab')) $('divLab').title = hint;
+  showPending(); showEditor();
+  $('divLab').title = '8 beats, played twice in each phrase, left to right. ' + DIV_HINT[state.divVoice];
 }
 
-const drawWait = multislider($('msWait'), { arr: () => state.waits[state.waitVoice], min: 0, max: 1, step: 0.01,
+const drawWait = multislider($('msWait'), { arr: () => state.waits[state.divVoice], min: 0, max: 1, step: 0.01,
   fmt: v => v >= 0.95 ? 'WAIT' : Math.round(1 + 9 * v) + ' s', name: i => 'rest after phrase ' + (i + 1), foot: true,
-  pend: () => isPending('wait', state.waitVoice),
+  pend: () => isPending('wait', state.divVoice),
   onChange: (i, x) => { chosen.forEach(v => { state.waits[v][i] = x; engine.send(`wait${v}_${i}`, x); pending.wait.add(v); }); showPending(); save(); } });
-const drawWaitTabs = $('waitTabs') ? tabs($('waitTabs'), voiceNames, () => state.waitVoice, v => selectVoice(v)) : () => {};
 
 function showAll() {
-  showVol(); showBin(); showVoices(); drawPresets(); showRhythm(); drawWaitTabs();
+  showVol(); showBin(); showVoices(); drawPresets(); showRhythm();
   $('room').value = state.room; $('drift').value = state.drift; $('tonic').value = state.tonic; $('colA').value = state.colA; $('colB').value = state.colB;
 }
 showAll();
@@ -233,8 +209,8 @@ if ($('picture')) picture($('picture'), {
 const drawLines = $('lines') ? lines($('lines'), {
   names: VOICES.map(v => v[1]), on: v => state.on[v], lvl: v => state.lvl[v], chosen: v => chosen.has(v), dB,
   about: v => `${voiceNames[v]}: ${VOICES[v][2]}.\nClick the name: on or off. Click the line: choose it (shift-click: several). Drag: level.`,
-  toggle: v => togBtns[v].click(), choose: selectVoice,
-  level: (v, x) => { state.lvl[v] = x; engine.send('lvl' + v, x); drawLvl(); save(); } }) : () => {};
+  toggle: toggleVoice, choose: selectVoice,
+  level: (v, x) => { state.lvl[v] = x; engine.send('lvl' + v, x); save(); } }) : () => {};
 
 // twelve keys: the lit ones are the scale sounding now, the dot is the note it is on,
 // and a click chooses the home note
@@ -284,7 +260,6 @@ async function start() {
 async function stop() {
   clearInterval(timer); timer = null; playing = false;
   $('play').textContent = 'PLAY'; $('meter').style.width = '0'; $('now').textContent = '';
-  togBtns.forEach(b => b.classList.remove('run'));
   put('keyBox', ''); drawLines(0); showKeys(-1, -1);
   for (const k in pending) pending[k].clear();
   showPending();
@@ -319,14 +294,13 @@ async function tick() {
   if (!values || !playing) return;
   const [level, bitsF, colour, tonic, section] = values, bits = Math.round(bitsF);
   $('meter').style.width = Math.min(100, level * 400) + '%';
-  togBtns.forEach((b, v) => b.classList.toggle('run', !!(bits & (1 << v))));
 
   // a voice that has just begun a phrase has read its controls: nothing of its is pending now
   const begun = bits & ~lastBits; lastBits = bits;
   let cleared = false, heard = false;
   VOICES.forEach((_, v) => { if (begun & (1 << v)) for (const k in pending) if (pending[k].delete(v)) { cleared = true; heard = heard || chosen.has(v); } });
   if (cleared) showPending();
-  if (heard) { put('pendTxt', 'playing it now'); setTimeout(showPending, 2500); }
+  if (heard) { put('pendTxt', 'now'); setTimeout(showPending, 2500); }
   if ($('keys')) $('keys').classList.toggle('wait', gather.waiting);
 
   // a new section answers a root or harmony change
@@ -338,7 +312,7 @@ async function tick() {
   showKeys((((Math.round(tonic) + 2) % 12) + 12) % 12, Math.round(colour));
   const key = `<b>${colourName}</b> on <b>${note}</b>`;
   $('now').innerHTML = gather.waiting
-    ? key + ' · <span style="color:var(--glow)">change requested: the voices are finishing their phrases, then it begins again</span>'
+    ? key + ' · <span style="color:var(--glow)">changing at the next silence</span>'
     : key + ((bits & 7) === 0 && t > 3 ? ' · counter, bass and chords are silent' : '');
 }
 

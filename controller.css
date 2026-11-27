@@ -37,7 +37,6 @@
 #controller .ms .b{position:relative;background:#0c0c0c;border:1px solid #222;border-radius:6px;overflow:hidden}
 #controller .ms .b:focus-visible{outline:1px solid #ffd98a}
 #controller .ms .b i{position:absolute;left:0;right:0;bottom:0;background:#cfcfcf;opacity:.85}
-#controller .ms .b.off i{background:#3a3a3a}
 #controller .ms .b.pend{border:1px dashed #ffd98a}
 #controller .ms .b.pend i{background:#ffd98a}
 #controller .ms .b span{position:absolute;left:0;right:0;top:3px;text-align:center;font-size:9px;color:#bbb;mix-blend-mode:difference}
