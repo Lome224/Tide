@@ -7,6 +7,9 @@ import * as engine from './engine.js';
 import { $, put, hooks, pending, chosen, showPending, showController, showKeys, drawLines, sendVol, showHome } from './controls.js';
 
 let piece = 'tide', timer = null, t0 = 0, lastBits = 0;
+// An audio output opened inside a click (window.Tide.unlock). A host page calls that from its
+// own ENTER button, so the sound may begin later, once everything has loaded.
+let unlocked = null;
 hooks.restart = () => stop().then(start);
 hooks.pause = () => stop();
 
@@ -17,7 +20,9 @@ async function start() {
   $('play').disabled = true; setStatus('starting…');
   try {
     live.lite = state.bin ? 0 : 1;
-    await engine.start(piece, { ...allChannels(), lite: live.lite, vol: live.quiet ? 0 : state.vol });
+    // the unlocked output is used once; later starts come from a click on PLAY and open their own
+    const output = unlocked && unlocked.state !== 'closed' ? unlocked : null; unlocked = null;
+    await engine.start(piece, { ...allChannels(), lite: live.lite, vol: live.quiet ? 0 : state.vol }, output);
     for (const k in pending) pending[k].clear();   // everything is read fresh at the start
     live.playing = true; t0 = performance.now(); lastBits = 0; gather.waiting = false; gather.section = -1;
     $('play').textContent = 'PAUSE';
@@ -45,9 +50,12 @@ window.Tide = {
   start: () => live.playing ? Promise.resolve() : start(),
   stop: () => live.playing ? stop() : Promise.resolve(),
   quiet: q => { live.quiet = !!q; sendVol(); },
+  unlock: () => { try { unlocked = unlocked || new AudioContext(); unlocked.resume(); } catch (e) { unlocked = null; } },
+  loaded: false,   // true once Csound, the piece and its data have arrived
   controller: open => showController(open === undefined ? $('controller').hidden : open),
   isPlaying: () => live.playing };
 window.dispatchEvent(new Event('tide-ready'));
+engine.loaded.then(() => { window.Tide.loaded = true; window.dispatchEvent(new Event('tide-loaded')); }, () => {});
 
 // several times a second: show what the piece is doing
 async function tick() {

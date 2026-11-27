@@ -36,16 +36,18 @@ function getHrtf(rate) {
   }));
 }
 
-// start loading early, so PLAY is quick
+// Start loading early, so PLAY is quick: Csound, the piece, and the HRTF data for the most
+// common sample rate (another rate's data is fetched at the start, if it is needed).
 const modP = import(CSOUND_URL);
-modP.catch(() => {});
-getSource('tide').catch(() => {}); getHrtf(44100).catch(() => {}); getHrtf(48000).catch(() => {});
+export const loaded = Promise.all([modP, getSource('tide'), getHrtf(48000)]);
+loaded.catch(() => {});
 
 let cs = null;
 export const isRunning = () => cs !== null;
 
 // Start a piece with every control already set. Throws if the browser cannot play it.
-export async function start(piece, channels) {
+// audioContext: optional; one the page opened during a click, so the browser lets it sound.
+export async function start(piece, channels, audioContext) {
   const mod = await modP;
   const text = await getSource(piece);
   const make = async opts => {
@@ -59,8 +61,9 @@ export async function start(piece, channels) {
     await c.start();
     return c;
   };
-  try { cs = await make({}); }
-  catch (e) { console.warn('Tide: retrying with ScriptProcessor', e); cs = await make({ useSPN: true }); }
+  const own = audioContext ? { audioContext } : {};
+  try { cs = await make(own); }
+  catch (e) { console.warn('Tide: retrying with ScriptProcessor', e); cs = await make({ ...own, useSPN: true }); }
 }
 
 export async function stop() {
