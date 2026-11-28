@@ -12,35 +12,26 @@
 </head>
 <body>
 <main>
-  <header>
-    <h1>TIDE</h1>
-    <p class="sub">a generative soundscape, synthesised live in your browser with Csound</p>
-  </header>
-
-  <!-- front page: play, volume, a quick choice of sound -->
-  <div class="row">
-    <button id="play" class="glass" type="button">PLAY</button>
-    <label class="hs glass" for="vol">VOLUME <input type="range" id="vol" min="0" max="1" step="0.01"><output id="volOut"></output></label>
-  </div>
-  <div>
-    <div id="status">Headphones recommended.</div>
-    <div class="meter" aria-hidden="true"><i id="meter"></i></div>
-    <div id="now"></div>
-  </div>
-  <div class="row">
-    <button id="bin" class="bin glass" type="button" aria-pressed="true"
-      title="Binaural (HRTF) spatial audio: sounds move around your head. Switch off for speakers.">
-      <span id="binTxt">BINAURAL ON</span><small>headphones recommended</small>
-    </button>
-    <button id="ctlBtn" class="glass" type="button" aria-expanded="false" aria-controls="controller">OPEN CONTROLLER</button>
-  </div>
-
-  <!-- the controller, opened from the front page. Its parts come from js/markup.js -->
-  <div id="controller" hidden style="display:none;flex-direction:column">
-    <div class="body" id="controllerBody"></div>
-    <div class="row extra">
-      <button id="pTest" type="button" aria-pressed="false">BINAURAL TEST</button>
-    </div>
+  <!-- Two panes. The parts of the controller (the pad, the knobs, the voices, the harmony) come
+       from js/markup.js; controls.js puts them into these two panes. -->
+  <div id="controller">
+    <section class="body pane" id="paneMain" aria-label="Tide">
+      <h1>TIDE</h1>
+      <div class="row">
+        <button id="play" type="button">PLAY</button>
+        <label class="hs" for="vol">VOLUME <input type="range" id="vol" min="0" max="1" step="0.01"><output id="volOut"></output></label>
+        <button id="bin" type="button" aria-pressed="true"
+          title="Binaural (HRTF) spatial audio: sounds move around your head. Headphones recommended; switch off for speakers."><span id="binTxt">BINAURAL ON</span></button>
+      </div>
+      <div class="state">
+        <span class="meter" aria-hidden="true"><i id="meter"></i></span><span id="status">Headphones recommended.</span> <span id="now"></span>
+      </div>
+    </section>
+    <section class="body pane" id="paneMore" aria-label="Voices and harmony">
+      <div class="row extra">
+        <button id="pTest" type="button" aria-pressed="false" title="One sound heard four ways, about 50 seconds: plain stereo, binaural, binaural in a room, and a fly-past.">BINAURAL TEST</button>
+      </div>
+    </section>
   </div>
 
   <section class="about">
@@ -52,6 +43,7 @@
       <b>Drops</b> are water landing on glazed porcelain, <b>shimmer</b> is shards touching, the
       <b>waves</b> are filtered noise, and a <b>flyer</b> passes close with Doppler. With binaural
       on, each voice is placed around your head inside a binaural room.</p>
+    <p><a class="gh" href="https://github.com/Lome224/Tide" target="_blank" rel="noopener">Open GitHub ↗</a></p>
   </section>
 </main>
 

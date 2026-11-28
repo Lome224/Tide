@@ -36,7 +36,7 @@ async function start() {
 
 async function stop() {
   clearInterval(timer); timer = null; live.playing = false;
-  $('play').textContent = 'PLAY'; $('meter').style.width = '0'; $('now').textContent = '';
+  $('play').textContent = 'PLAY'; $('meter').style.width = '0'; $('now').textContent = ''; said.until = 0;
   showHome(); drawLines(0); showKeys(-1, -1);
   for (const k in pending) pending[k].clear();
   showPending();
@@ -62,6 +62,13 @@ window.Tide = {
 window.dispatchEvent(new Event('tide-ready'));
 engine.loaded.then(() => { window.Tide.loaded = true; window.dispatchEvent(new Event('tide-loaded')); }, () => {});
 
+// a passing message, and how long any of them stays (milliseconds)
+const STAY = 6000, said = { text: '', amber: false, until: 0 };
+function say(text, amber = false) {
+  if (text !== said.text && performance.now() < said.until) return;   // the one on screen is not replaced early
+  said.text = text; said.amber = amber; said.until = performance.now() + STAY;
+}
+
 // several times a second: show what the piece is doing
 async function tick() {
   const t = (performance.now() - t0) / 1000;
@@ -85,7 +92,7 @@ async function tick() {
   let cleared = false, heard = false;
   VOICES.forEach((_, v) => { if (begun & (1 << v)) for (const k in pending) if (pending[k].delete(v)) { cleared = true; heard = heard || chosen.has(v); } });
   if (cleared) showPending();
-  if (heard) { put('pendTxt', 'now'); setTimeout(showPending, 2500); }
+  if (heard) { put('pendTxt', 'rests: in use'); setTimeout(showPending, STAY); }
   if ($('keys')) $('keys').classList.toggle('wait', gather.waiting);
 
   // a new section answers a root or harmony change
@@ -96,9 +103,11 @@ async function tick() {
   put('keyBox', note); drawLines(bits);
   showKeys((((Math.round(tonic) + 2) % 12) + 12) % 12, Math.round(colour));
   const key = `<b>${colourName}</b> on <b>${note}</b>`;
-  $('now').innerHTML = gather.waiting
-    ? key + ' · <span style="color:var(--glow)">changing…</span>'
-    : key + ((bits & 7) === 0 && t > 3 ? ' · counter, bass and chords are silent' : '');
+  // A passing message stays on screen for at least STAY, so that it can be read.
+  if (gather.waiting) say('changing: voices restart', true);
+  else if ((bits & 7) === 0 && t > 3) say('shared silence: the scale changes');
+  const msg = performance.now() < said.until ? ` · <span${said.amber ? ' style="color:var(--glow)"' : ''}>${said.text}</span>` : '';
+  $('now').innerHTML = key + msg;
 }
 
 /* ---------- binaural test (only on Tide's own page) ---------- */

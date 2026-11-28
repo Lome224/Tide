@@ -16,13 +16,14 @@ It extends the system of *The Blue Left Spinning*: each voice stands where a scu
 
 | File | What it does |
 | --- | --- |
-| `index.html` | The page's contents only: front page (play, volume, binaural) and an empty place for the controller. |
+| `index.html` | The page's contents only: two panes side by side (Tide on the left; voices and harmony on the right), and the text below them. |
 | `style.css` | How Tide's own page looks. |
 | `controller.css` | How the controller looks. Also used by any site that shows Tide. |
 | `js/config.js` | Fixed data: voice names, presets, starting rhythm and breath rows. Edit presets here. |
 | `js/state.js` | What the controls are set to, saved between visits, and the list of Csound channels. |
 | `vendor/csound.js` | Csound for the browser: `@csound/browser` 6.18.7, unchanged, from the Csound developers (LGPL 2.1). Kept here so Tide loads nothing from other servers. |
 | `js/engine.js` | The sound engine: loads Csound, the piece and the HRTF data; start, stop, send, read. |
+| `js/tips.js` | The explanations that appear when the pointer rests on a control. |
 | `js/multislider.js` | The multislider and the rows of buttons. |
 | `js/markup.js` | The controller's parts, as HTML. Written into the page by `main.js`. |
 | `js/picture.js` | The pad: density, drift and room as one picture you can drag. |

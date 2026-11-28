@@ -25,7 +25,7 @@ export const tonicOffset = () => ((state.tonic - 2 + 5 + 12) % 12) - 5;
 // Every control as a Csound channel: name -> number.
 export function allChannels() {
   const ch = { vol: state.vol, bin: state.bin, room: state.room, drift: state.drift, cut: 3750,
-    tonic: tonicOffset(), colA: state.colA, colB: state.colB, gather: gather.sent };
+    tonic: tonicOffset(), colA: state.colA, colB: state.colB, side: 0, gather: gather.sent };
   VOICES.forEach((_, v) => {
     ch['on' + v] = state.on[v]; ch['act' + v] = state.act[v]; ch['lvl' + v] = state.lvl[v];
     for (let i = 0; i < 8; i++) { ch[`div${v}_${i}`] = state.divs[v][i]; ch[`wait${v}_${i}`] = state.waits[v][i]; }

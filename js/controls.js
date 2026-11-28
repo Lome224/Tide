@@ -8,6 +8,7 @@ import { multislider, tabs } from './multislider.js';
 import { picture } from './picture.js';
 import { lines } from './lines.js';
 import { CONTROLLER } from './markup.js';
+import { tips } from './tips.js';
 
 // two things only main.js can do; it fills these in
 export const hooks = { restart() {}, leave(url) { location.href = url; } };
@@ -15,6 +16,16 @@ export const hooks = { restart() {}, leave(url) { location.href = url; } };
 export const $ = id => document.getElementById(id);
 // the controller's parts are written into the page first, so everything below can find them
 if ($('controllerBody')) $('controllerBody').innerHTML = CONTROLLER;
+else if ($('paneMain')) {
+  // Tide's own page: two panes side by side. The pad and its strip join the left one;
+  // the finer controls (voices, harmony) fill the right one and are always open.
+  const parts = document.createElement('div');
+  parts.innerHTML = CONTROLLER;
+  const more = parts.querySelector('#more');
+  $('paneMore').prepend(more); more.hidden = false;
+  $('paneMain').append(...parts.children);
+  $('moreBtn').hidden = true;
+}
 export const put = (id, text) => { if ($(id)) $(id).textContent = text; };   // for parts not every page has
 const voiceNames = VOICES.map(v => v[0]);
 
@@ -68,7 +79,7 @@ function applyPreset(i) {
   showAll(); save();
 }
 const drawPresets = tabs($('presets'), PRESETS.map(p => p.name), () => state.preset, applyPreset);
-[...$('presets').children].forEach((b, i) => { b.title = PRESETS[i].title; });
+[...$('presets').children].forEach((b, i) => { b.dataset.tip = PRESETS[i].title; });
 
 /* ---------- controller: voices ---------- */
 function toggleVoice(v) {
@@ -98,9 +109,19 @@ NOTES.forEach((name, i) => $('tonic').add(new Option(name, i)));
 // the two scales the piece alternates between
 ['colA', 'colB'].forEach(k => {
   COLOUR_MENU.forEach(i => $(k).add(new Option(COLOURS[i], i)));
-  $(k).addEventListener('change', e => { state[k] = +e.target.value; state.preset = -1; engine.send(k, state[k]); askGather(); drawPresets(); save(); });
+  // the piece begins again in the scale that was just chosen, so the choice is heard at once
+  $(k).addEventListener('change', e => {
+    state[k] = +e.target.value; state.preset = -1;
+    engine.send(k, state[k]); engine.send('side', k === 'colB' ? 1 : 0);
+    askGather(); drawPresets(); save();
+  });
 });
-$('tonic').addEventListener('change', e => { state.tonic = +e.target.value; engine.send('tonic', tonicOffset()); askGather(); showHome(); save(); });
+// a new home note begins again in whichever of the two scales is sounding
+$('tonic').addEventListener('change', e => {
+  state.tonic = +e.target.value; engine.send('tonic', tonicOffset());
+  engine.send('side', nowScale === state.colB && state.colA !== state.colB ? 1 : 0);
+  askGather(); showHome(); save();
+});
 // while nothing is playing, the NOW ON box shows the home note: where the piece will begin
 export function showHome() { if (!live.playing) put('keyBox', NOTES[state.tonic]); }
 ['room', 'drift'].forEach(k => $(k).addEventListener('input', e => { state[k] = +e.target.value; engine.send(k, state[k]); showEditor(); save(); }));
@@ -138,7 +159,7 @@ $('selAll').addEventListener('click', () => {
 });
 function showRhythm() {
   showPending(); showEditor();
-  $('divLab').title = '8 beats, played twice in each phrase, left to right. ' + DIV_HINT[state.divVoice];
+  $('divLab').dataset.tip = '8 beats, played twice in each phrase, left to right. ' + DIV_HINT[state.divVoice];
 }
 
 const drawWait = multislider($('msWait'), { arr: () => state.waits[state.divVoice], min: 0, max: 1, step: 0.01,
@@ -152,16 +173,10 @@ function showAll() {
 }
 showAll();
 
-/* ---------- the controller opens from the front page ---------- */
+/* ---------- inside another site, the controller is a window that opens and closes ---------- */
 export function showController(open) {
   $('controller').hidden = !open; $('controller').style.display = open ? 'flex' : 'none';
-  if ($('ctlBtn')) {
-    $('ctlBtn').textContent = open ? 'CLOSE CONTROLLER' : 'OPEN CONTROLLER';
-    $('ctlBtn').setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-  if (!EMBED) history.replaceState(null, '', open ? '#controller' : location.pathname + location.search);
 }
-if ($('ctlBtn')) $('ctlBtn').addEventListener('click', () => showController($('controller').hidden));
 // knobs: a dial drawn over a slider. Drag up or down, or scroll; a chosen sound turns them too
 document.querySelectorAll('#controller label.knob').forEach(k => {
   const inp = k.querySelector('input');
@@ -187,20 +202,14 @@ if ($('moreTabs')) {
   showTab('voices');
 }
 
-// the detailed controls can sit behind a MORE button
 // Inside another site only the simple part is shown: MORE leads to Tide's own page, where the
 // full controller is. It opens in the same tab, so the browser's back button returns to the site.
 // The piece here is stopped completely first (hooks.leave), so it cannot come back broken.
-if (EMBED && $('moreBtn')) {
+if (EMBED) {
   $('moreBtn').textContent = 'MORE →';
-  $('moreBtn').title = 'Open the full controller on Tide\'s own page';
-  $('moreBtn').addEventListener('click', () => hooks.leave(new URL('../#controller', import.meta.url).href));
-} else if ($('moreBtn')) $('moreBtn').addEventListener('click', () => {
-  const open = $('more').hidden;
-  $('more').hidden = !open; $('moreBtn').setAttribute('aria-expanded', open ? 'true' : 'false');
-  $('moreBtn').textContent = open ? 'LESS' : 'MORE';
-  showAll();
-});
+  $('moreBtn').dataset.tip = 'Open the full controller on Tide\'s own page';
+  $('moreBtn').addEventListener('click', () => hooks.leave(new URL('..', import.meta.url).href));
+}
 
 /* ---------- the pad: density, drift and room as one picture (where the page has one) ---------- */
 if ($('picture')) picture($('picture'), {
@@ -236,6 +245,7 @@ export function showKeys(note = nowNote, scale = nowScale) {
 }
 showKeys();
 
-showController(!EMBED && location.hash === '#controller');
-// arriving from another site's MORE: show everything
-if (!EMBED && location.hash === '#controller' && $('moreBtn')) $('moreBtn').click();
+if (EMBED) showController(false);
+
+// explanations appear at once (tips.js); every title in the controller becomes one
+tips('#controller [title], #bin[title]');

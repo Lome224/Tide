@@ -64,8 +64,10 @@ endop
 opcode NewSection, 0, 0
   giSection = giSection + 1
   ireq chnget "gather"
-  ; a change made on the page begins with its first colour
-  giSide = (ireq != giGatherDone ? 0 : 1 - giSide)
+  ; a change made on the page begins with the colour it names (channel "side": 0 = colA,
+  ; 1 = colB), so that the scale just chosen is the one heard
+  iside CtlI "side", 0
+  giSide = (ireq != giGatherDone ? (iside > 0.5 ? 1 : 0) : 1 - giSide)
   ia CtlI "colA", 1
   ib CtlI "colB", 0
   giColour = int(limit(giSide == 0 ? ia : ib, 0, 9))

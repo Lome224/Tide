@@ -52,7 +52,7 @@
 #controller .pair{display:grid;grid-template-columns:1fr 1fr;gap:1.455em}
 #controller .pair .lab{margin-bottom:0.455em}
 #controller .ms .b span:not(.ft){font-size:0.727em}
-#controller .lab[title]{cursor:help}
+#controller .lab[data-tip]{cursor:help}
 #controller .body .tabs button{padding:0.364em 0.727em;font-size:0.864em}
 #controller .readmore{color:#e8e8e8;text-decoration:none;border-bottom:1px solid #555;align-self:flex-start}
 #controller .readmore:hover,#controller .readmore:focus-visible{color:#ffd98a;border-color:#ffd98a;outline:none}
@@ -105,3 +105,9 @@
   #controller .ms.short,#controller .ms{height:7.636em}
   #controller .hs input{width:13.636em}
 }
+
+/* an explanation, shown by js/tips.js beside the control it explains */
+.tide-tip{position:fixed;z-index:1000;max-width:26em;padding:.55em .8em;border:1px solid #555;border-radius:6px;
+  background:#0b0b0b;color:#e8e8e8;font:12px/1.45 "IBM Plex Mono",ui-monospace,Menlo,monospace;letter-spacing:.02em;
+  white-space:pre-line;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.6)}
+.tide-tip[hidden]{display:none}
