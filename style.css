@@ -1,43 +1,76 @@
-/* Tide: the appearance of Tide's own page. The controller's look is in controller.css. */
-:root{--fg:#e8e8e8;--dim:#8a8a8a;--line:#333;--glow:#ffd98a}
+/* Tide: the appearance of Tide's own page, in the dark glass of salomezhang.com.
+   The controller's own look (its bars, knobs, drawings) is in controller.css. */
+:root{--fg:#e8e8e8;--dim:#8a8a8a;--line:#333;
+  --glass:linear-gradient(to bottom, rgba(255,255,255,.22), rgba(255,255,255,.06) 50%, rgba(255,255,255,.02) 51%, rgba(255,255,255,.08));
+  --glass-edge:rgba(255,255,255,.25);
+  --glow:linear-gradient(to bottom, rgba(255,226,150,.30), rgba(255,206,110,.12) 50%, rgba(255,196,90,.08) 51%, rgba(255,214,120,.16));
+  --glow-edge:rgba(255,222,150,.55);
+  --dark:linear-gradient(to bottom, rgba(110,110,110,.86), rgba(45,45,45,.86) 50%, rgba(20,20,20,.86) 51%, rgba(38,38,38,.86))}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%;background:#000;color:var(--fg);
+html,body{margin:0;min-height:100%;color:var(--fg);
   font:13px/1.55 "IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.03em}
-main{padding:22px 22px 48px;display:flex;flex-direction:column;gap:22px}
+/* something soft behind the glass, so that it reads as glass */
+body{background:#000 radial-gradient(110% 80% at 50% 0%, #34322e 0%, #141414 48%, #000 100%) fixed}
+main{padding:0 28px 56px}
 
-/* Two panes side by side: Tide on the left, its voices and harmony on the right. Together they
-   fill the window exactly; the text is below, reached by scrolling. */
-div#controller{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:stretch;
-  min-height:calc(100vh - 44px);background:none;font-size:13px}
-#controller .pane{border:1px solid var(--line);border-radius:10px;overflow:visible}
-h1{margin:0;font-weight:400;font-size:1.7em;letter-spacing:.3em}
-.row{display:flex;gap:.8em;align-items:center;flex-wrap:wrap}
-/* PLAY and BINAURAL are one size, whatever they say (PLAY or PAUSE, ON or OFF) */
-#play,#bin{width:10.5em;text-align:center;white-space:nowrap}
-#bin[aria-pressed="true"]{background:#111;color:var(--fg);border-color:#bbb}
+/* the first screen: the two windows, centred, with room around them */
+.stage{min-height:100vh;display:grid;place-items:center;padding:48px 0}
+div#controller{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:26px;align-items:stretch;
+  width:min(1060px, 100%);background:none;font-size:12px}
+
+/* a window: a dark glass pane under a title bar, as on salomezhang.com */
+.pane{display:flex;flex-direction:column;border:1px solid var(--glass-edge);border-radius:10px;overflow:hidden;
+  background:linear-gradient(to bottom, rgba(255,255,255,.09), rgba(255,255,255,.03));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 14px 38px rgba(0,0,0,.75);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.pane .bar{margin:0;height:28px;display:flex;align-items:center;justify-content:center;
+  background:var(--dark);border-bottom:1px solid #000;box-shadow:inset 0 1px 0 rgba(255,255,255,.35);
+  color:#fff;text-shadow:0 1px 1px #000;font-size:12px;font-weight:400;letter-spacing:.04em;user-select:none}
+div#controller .pane .body{flex:1 1 auto;gap:16px;padding:20px 22px 22px}
+
+.row{display:flex;gap:1em;align-items:center;flex-wrap:wrap}
+/* play, volume and binaural stay on one line: the volume slider takes what is left */
+#paneMain > .row{flex-wrap:nowrap}
+#paneMain > .row .hs{flex:1 1 auto;min-width:0}
+div#controller #paneMain > .row .hs input{flex:1 1 auto;width:auto;min-width:3em}
 .hs output{width:3.2em;color:var(--dim)}
 .state{color:var(--dim);min-height:1.5em}
 .state b{color:var(--fg);font-weight:400}
-.meter{display:inline-block;width:5em;height:2px;margin:0 .7em .25em 0;background:#222;border-radius:2px;overflow:hidden;vertical-align:middle}
-.meter i{display:block;height:100%;width:0;background:#bbb;transition:width .1s}
-/* on this page the finer controls are always open and fill their pane; the binaural test sits under them */
-div#controller .body > #more{border-top:0;padding:0;overflow:visible}
-/* the two drawings take whatever height is left in their pane */
-div#controller:has(#more:not([hidden])) #picture{flex:1 1 0;height:auto;min-height:20em}
-div#controller #more,div#controller #more section[data-tab="voices"]{flex:1 1 auto}
-div#controller #lines{flex:1 1 0;height:auto;min-height:12em}
-#controller .extra{margin-top:auto;padding-top:1em;border-top:1px solid #2a2a2a}
+.meter{display:inline-block;width:5em;height:2px;margin:0 .7em .25em 0;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden;vertical-align:middle}
+.meter i{display:block;height:100%;width:0;background:#fff;transition:width .1s}
+
+/* glass buttons; the one that is on glows amber, as on the site */
+div#controller .body :is(#play, #bin, #pTest, #selAll), div#controller #moreTabs button{
+  background:var(--glass);border:1px solid var(--glass-edge);border-radius:10px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.9);
+  transition:background .25s, border-color .25s, box-shadow .25s, color .25s}
+div#controller .body :is(#play, #bin, #pTest, #selAll):hover, div#controller #moreTabs button:hover,
+div#controller .body :is(#bin, #pTest)[aria-pressed="true"], div#controller #moreTabs button[aria-pressed="true"],
+div#controller .body #presets button[aria-pressed="true"]{
+  background:var(--glow);border-color:var(--glow-edge);color:#fff6dc;
+  box-shadow:inset 0 1px 0 rgba(255,244,210,.55), 0 0 18px rgba(255,200,90,.32)}
+/* PLAY and BINAURAL are one size, whatever they say (PLAY or PAUSE, ON or OFF) */
+#play,#bin{width:10.5em;text-align:center;white-space:nowrap}
+
+/* on this page the finer controls are always open; the binaural test sits under them */
+div#controller .body > #more{border-top:0;padding:0;overflow:visible;flex:1 1 auto}
+div#controller:has(#more:not([hidden])) #picture{display:block;height:21em}
+div#controller #lines{height:14em}
+#controller .extra{margin-top:auto;padding-top:1.2em;border-top:1px solid rgba(255,255,255,.12)}
 #controller .readmore{display:none}
 
-.about{color:var(--dim);border-top:1px solid var(--line);padding-top:18px;columns:2;column-gap:28px}
+.about{width:min(1060px, 100%);margin:0 auto;color:var(--dim);border-top:1px solid var(--line);padding-top:22px;columns:2;column-gap:32px}
 .about p{margin:0 0 10px;break-inside:avoid}
 .about b{color:var(--fg);font-weight:400}
 .about .gh{color:var(--fg);text-decoration:none;border-bottom:1px solid #555}
-.about .gh:hover,.about .gh:focus-visible{color:var(--glow);border-color:var(--glow);outline:none}
+.about .gh:hover,.about .gh:focus-visible{color:#ffd98a;border-color:#ffd98a;outline:none}
 
-/* narrow windows: one pane above the other */
+/* narrow windows: one pane above the other, at its natural height */
 @media (max-width:900px){
-  div#controller{grid-template-columns:minmax(0,1fr);min-height:0;font-size:12px}
-  div#controller:has(#more:not([hidden])) #picture{display:block}   /* here the pad always shows */
+  main{padding:0 14px 40px}
+  .stage{min-height:0;padding:16px 0 28px}
+  div#controller{grid-template-columns:minmax(0,1fr);gap:16px}
+  div#controller .pane .body{padding:16px}
+  #paneMain > .row{flex-wrap:wrap}
   .about{columns:1}
 }

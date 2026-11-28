@@ -49,9 +49,15 @@ export function picture(cv, o, rows = 7) {
     g.font = `${12 * k}px ui-monospace, Menlo, monospace`; g.textBaseline = 'middle';
     if (down || now - touched < 1500) {
       const pct = v => Math.round(v * 100), text = what === 'room' ? `ROOM ${pct(room)}` : `DENSITY ${pct(density)}  ·  DRIFT ${pct(drift)}`;
-      const left = x > W / 2, tx = x + (left ? -1 : 1) * (16 + room * 16) * k, w = g.measureText(text).width + 12 * k;
-      g.fillStyle = '#000'; g.fillRect(left ? tx - w : tx, y - 22 * k, w, 18 * k);
-      g.fillStyle = '#fff'; g.textAlign = left ? 'right' : 'left'; g.fillText(text, tx + (left ? -6 : 6) * k, y - 13 * k);
+      // a small glass label above the dot (below it near the top edge), clear of the cross-lines
+      g.font = `${10.5 * k}px ui-monospace, Menlo, monospace`;
+      const w = g.measureText(text).width + 16 * k, h = 20 * k, ring = (8 + room * 16) * k;
+      const bx = Math.max(2, Math.min(W - w - 2, x - w / 2)), by = y - ring - h - 8 * k < 2 ? y + ring + 8 * k : y - ring - h - 8 * k;
+      g.beginPath(); g.roundRect(bx, by, w, h, 5 * k);
+      g.fillStyle = 'rgba(22,22,22,.82)'; g.fill();
+      g.strokeStyle = 'rgba(255,255,255,.28)'; g.lineWidth = 1; g.stroke();
+      g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(text, bx + w / 2, by + h / 2 + 0.5 * k);
+      g.font = `${12 * k}px ui-monospace, Menlo, monospace`;
     }
     // one name for each direction, with an arrow toward more
     g.fillStyle = '#fff'; g.textAlign = 'center';

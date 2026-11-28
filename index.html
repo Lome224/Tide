@@ -12,26 +12,34 @@
 </head>
 <body>
 <main>
-  <!-- Two panes. The parts of the controller (the pad, the knobs, the voices, the harmony) come
-       from js/markup.js; controls.js puts them into these two panes. -->
-  <div id="controller">
-    <section class="body pane" id="paneMain" aria-label="Tide">
-      <h1>TIDE</h1>
-      <div class="row">
-        <button id="play" type="button">PLAY</button>
-        <label class="hs" for="vol">VOLUME <input type="range" id="vol" min="0" max="1" step="0.01"><output id="volOut"></output></label>
-        <button id="bin" type="button" aria-pressed="true"
-          title="Binaural (HRTF) spatial audio: sounds move around your head. Headphones recommended; switch off for speakers."><span id="binTxt">BINAURAL ON</span></button>
-      </div>
-      <div class="state">
-        <span class="meter" aria-hidden="true"><i id="meter"></i></span><span id="status">Headphones recommended.</span> <span id="now"></span>
-      </div>
-    </section>
-    <section class="body pane" id="paneMore" aria-label="Voices and harmony">
-      <div class="row extra">
-        <button id="pTest" type="button" aria-pressed="false" title="One sound heard four ways, about 50 seconds: plain stereo, binaural, binaural in a room, and a fly-past.">BINAURAL TEST</button>
-      </div>
-    </section>
+  <!-- The first screen: two glass windows, centred. The parts of the controller (the pad, the
+       knobs, the voices, the harmony) come from js/markup.js; controls.js puts them into the
+       two windows' bodies. -->
+  <div class="stage">
+    <div id="controller">
+      <section class="pane" aria-labelledby="tMain">
+        <h1 class="bar" id="tMain">Tide</h1>
+        <div class="body" id="paneMain">
+          <div class="row">
+            <button id="play" type="button">PLAY</button>
+            <label class="hs" for="vol">VOLUME <input type="range" id="vol" min="0" max="1" step="0.01"><output id="volOut"></output></label>
+            <button id="bin" type="button" aria-pressed="true"
+              title="Binaural (HRTF) spatial audio: sounds move around your head. Headphones recommended; switch off for speakers."><span id="binTxt">BINAURAL ON</span></button>
+          </div>
+          <div class="state">
+            <span class="meter" aria-hidden="true"><i id="meter"></i></span><span id="status">Headphones recommended.</span> <span id="now"></span>
+          </div>
+        </div>
+      </section>
+      <section class="pane" aria-labelledby="tMore">
+        <h2 class="bar" id="tMore">Voices · Harmony</h2>
+        <div class="body" id="paneMore">
+          <div class="row extra">
+            <button id="pTest" type="button" aria-pressed="false" title="One sound heard four ways, about 50 seconds: plain stereo, binaural, binaural in a room, and a fly-past.">BINAURAL TEST</button>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 
   <section class="about">
