@@ -3,11 +3,12 @@
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;background:#000;color:var(--fg);
   font:13px/1.55 "IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.03em}
-main{max-width:1240px;margin:0 auto;padding:28px 22px 48px;display:flex;flex-direction:column;gap:22px}
+main{padding:22px 22px 48px;display:flex;flex-direction:column;gap:22px}
 
-/* two panes side by side: Tide on the left, its voices and harmony on the right */
+/* Two panes side by side: Tide on the left, its voices and harmony on the right. Together they
+   fill the window exactly; the text is below, reached by scrolling. */
 div#controller{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:stretch;
-  background:none;font-size:13px}
+  min-height:calc(100vh - 44px);background:none;font-size:13px}
 #controller .pane{border:1px solid var(--line);border-radius:10px;overflow:visible}
 h1{margin:0;font-weight:400;font-size:1.7em;letter-spacing:.3em}
 .row{display:flex;gap:.8em;align-items:center;flex-wrap:wrap}
@@ -21,7 +22,10 @@ h1{margin:0;font-weight:400;font-size:1.7em;letter-spacing:.3em}
 .meter i{display:block;height:100%;width:0;background:#bbb;transition:width .1s}
 /* on this page the finer controls are always open and fill their pane; the binaural test sits under them */
 div#controller .body > #more{border-top:0;padding:0;overflow:visible}
-div#controller:has(#more:not([hidden])) #picture{height:22em}
+/* the two drawings take whatever height is left in their pane */
+div#controller:has(#more:not([hidden])) #picture{flex:1 1 0;height:auto;min-height:20em}
+div#controller #more,div#controller #more section[data-tab="voices"]{flex:1 1 auto}
+div#controller #lines{flex:1 1 0;height:auto;min-height:12em}
 #controller .extra{margin-top:auto;padding-top:1em;border-top:1px solid #2a2a2a}
 #controller .readmore{display:none}
 
@@ -33,7 +37,7 @@ div#controller:has(#more:not([hidden])) #picture{height:22em}
 
 /* narrow windows: one pane above the other */
 @media (max-width:900px){
-  div#controller{grid-template-columns:minmax(0,1fr);font-size:12px}
-  div#controller:has(#more:not([hidden])) #picture{display:block;height:19em}   /* here the pad always shows */
+  div#controller{grid-template-columns:minmax(0,1fr);min-height:0;font-size:12px}
+  div#controller:has(#more:not([hidden])) #picture{display:block}   /* here the pad always shows */
   .about{columns:1}
 }

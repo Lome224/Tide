@@ -7,7 +7,13 @@ const KEY = 'tideState11';
 export const state = structuredClone(DEFAULTS);
 // a first visit on a phone: plain stereo (which runs the light engine) and no shimmer or flyer
 if (PHONE) { state.bin = 0; state.on[5] = state.on[6] = 0; }
-try { Object.assign(state, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
+// Settings are kept between visits on Tide's own page. Inside another site (data-tide-embed)
+// every visit begins with the TIDE sound; only the volume and the binaural switch are kept.
+try {
+  const kept = JSON.parse(localStorage.getItem(KEY) || '{}');
+  if (document.documentElement.hasAttribute('data-tide-embed')) { if ('vol' in kept) state.vol = kept.vol; if ('bin' in kept) state.bin = kept.bin; }
+  else Object.assign(state, kept);
+} catch (e) {}
 export function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
 
 // What is happening now (not saved). quiet: a host page has asked for silence. lite: the light
