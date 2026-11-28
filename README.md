@@ -21,6 +21,7 @@ It extends the system of *The Blue Left Spinning*: each voice stands where a scu
 | `controller.css` | How the controller looks. Also used by any site that shows Tide. |
 | `js/config.js` | Fixed data: voice names, presets, starting rhythm and breath rows. Edit presets here. |
 | `js/state.js` | What the controls are set to, saved between visits, and the list of Csound channels. |
+| `media/backdrop.mp4` | The video behind Tide's own page (960 × 540, about 6 seconds, looped). |
 | `vendor/csound.js` | Csound for the browser: `@csound/browser` 6.18.7, unchanged, from the Csound developers (LGPL 2.1). Kept here so Tide loads nothing from other servers. |
 | `js/engine.js` | The sound engine: loads Csound, the piece and the HRTF data; start, stop, send, read. |
 | `js/tips.js` | The explanations that appear when the pointer rests on a control. |

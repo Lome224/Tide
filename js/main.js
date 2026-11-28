@@ -120,3 +120,14 @@ function selectPiece(p) {
   else setStatus(p === 'test' ? 'Binaural test: one source, four ways, about 50 s. Press PLAY.' : 'Headphones recommended.');
 }
 if ($('pTest')) $('pTest').addEventListener('click', () => selectPiece(piece === 'test' ? 'tide' : 'test'));
+
+/* ---------- the backdrop video (only on Tide's own page) ----------
+   It starts once the sound has loaded, or after five seconds, so the two do not compete for
+   the connection; it fades in when it can play. */
+if ($('bg')) {
+  const bg = $('bg');
+  const begin = () => { if (!bg.src) { bg.src = bg.dataset.src; bg.play().catch(() => {}); } };
+  bg.addEventListener('playing', () => bg.classList.add('on'), { once: true });
+  engine.loaded.then(begin, begin);
+  setTimeout(begin, 5000);
+}
